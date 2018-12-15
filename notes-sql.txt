@@ -1,0 +1,45 @@
+// 'CREATE TABLE'  - makes a new table;
+
+CREATE TABLE employees (
+  id INTEGER,
+  name TEXT,
+  job TEXT,
+  etc  TEXT
+);
+
+// 'INSERT INTO'  - adds entry in table;
+
+INSERT INTO employees (id, name, job, etc)
+VALUES (1, 'Jack', 'Programmer', 'misc');
+
+// 'SELECT'  - selects from a table;
+
+SELECT name FROM employees;
+// -> Jack
+
+// 'UPDATE'  - updates info for an entry in table;
+
+UPDATE employees
+SET name = 'Jack Standbridge'
+WHERE id = 1;
+
+// 'ALTER TABLE'  - alters the structure of table;
+
+ALTER TABLE employees
+ADD COLUMN age INTEGER;
+
+// 'DELETE FROM'  - deletes rows from table;
+
+DELETE FROM employees
+WHERE id = 1;
+
+
+// Order of operators:
+
+SELECT field, field, field
+FROM table
+WHERE condition
+GROUP BY field
+HAVING condition
+ORDER BY field
+LIMIT number

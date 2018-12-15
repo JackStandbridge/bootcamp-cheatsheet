@@ -1,0 +1,17 @@
+function multiplier(factor) {
+    console.log(factor);
+    return number => number * factor;
+}
+
+
+console.log(multiplier(3)(5));
+
+// OR
+
+byThree = multiplier(3);
+console.log(byThree(5));
+
+// → 15
+// the inner function is returned ready to accept a parameter. It is returned with 'factor' already set to the first parameter, and so is a closure.
+
+

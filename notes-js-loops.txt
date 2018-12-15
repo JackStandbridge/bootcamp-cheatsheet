@@ -1,0 +1,34 @@
+// for LOOPS:
+
+// for (let total = 0, i = 10, counter = 0; i; total += i, i--, counter++, console.log(counter === 5 ? `After pass number ${counter}, the total is ${total}` : ''));
+// //statement 1 is for initialising variables, but js doesn't care if you don't
+// //statement 2 is evaluated to true or false. If true, loop continues, else end
+// //statement 3 is done every loop. Useful for incrementing/decrementing values
+
+// for (let i = 10; i; i--) {
+//   console.log(i)
+// }
+
+
+// forEach LOOPS:
+
+// const Katie = [30, 'very nice', 'pretty', 'best'];
+// Katie[0] = 31;
+// Katie.forEach(function(item, pos, arr) {
+//   console.log(item, pos, arr)
+// })
+
+// Katie.forEach((item, pos, array) => console.log(item, pos, array))
+
+
+
+// let number = [1,2,3,4];
+// let bigNumbers = number.map(function(number) {
+//   return (number * 10);
+// })
+// console.log(bigNumbers);
+
+// bigNumbers = number.map(number => number * 10);
+// console.log(bigNumbers)
+// let variable = 10;
+

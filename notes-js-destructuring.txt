@@ -1,0 +1,16 @@
+// copy an array
+
+const arr1 = [1,2,3,4,5,5];
+
+const arr2 = [...arr1];
+
+const [arr3, ...arr4] = arr1;
+
+console.log(arr3, arr4)
+
+// switch variables
+
+let a = 1;
+let b = 2;
+[a, b] = [b, a];
+console.log('a', a, 'b', b);
