@@ -1,0 +1,315 @@
+// --- REDUX --- //
+
+// Store: Redux.createStore() makes the Redux store and takes a reducer function as an argument:
+
+const store = Redux.createStore(reducer);
+
+// getting state out of the store:
+
+let currentState = store.getState();
+
+// Action: JS object that contains information about what happened. Must include 'type' property:
+
+const action = { type: 'LOGIN' };
+
+// Action Creator: JS function that returns an action (object with { type: '' [, data: ''] } keys):
+
+const actionCreator = () => action;
+
+// Dispatch action events: use store.dispatch() to dispatch an action (object) to the store:
+
+store.dispatch(actionCreator());   // <- these
+store.dispatch(action);            // <- are all
+store.dispatch({ type: 'LOGIN' }); // <- the same
+
+// Reducer: function that handles what the store does with the action. Responsible for state management. Seems similar to setState() in React, but just returns the new state, rather than setting it. Reducer takes 'state' and 'action' as arguments and always returns a NEW state (never modify existing state), and does nothing else:
+
+const defaultState = { auth: false } // <- use this to set default as ES6 arg
+
+const reducer = (state = defaultState, action) {
+  return action.type === 'LOGIN' ? { auth: true } : state;
+}
+
+// use switch/case statements to handle different eventualities:
+
+const authReducer = (state = defaultState, action) {
+  switch (action.type) {
+    case 'LOGIN':
+      return { auth: true };
+      break;
+    case 'LOGOUT':
+      return { auth: false };
+      break;
+    default: return state;
+  }
+}
+
+// store action types in constants:
+
+const LOGIN = 'LOGIN';
+const LOGOUT = 'LOGOUT';
+
+// then use them in switch/cases and reducers:
+
+// ... switch...
+    case LOGIN:
+      return { auth: true };
+// ...
+
+// ... reducer...
+/* ... */ return action.type === LOGIN ? { auth: true } /* ... */
+
+
+// store.subscribe() adds a listener to the store which is called every time an action is dispatched to the store:
+
+store.subscribe(() => console.log('an action was dispatched to the store.'));
+
+// combine reducers with Redux.combineReducers(), and pass it an object with values being the reducers (not called) you want to combine. Then, you can Redux.createStore() with the root reducer:
+
+const rootReducer = Redux.combineReducers({
+  auth: authReducer,
+  content: contentReducer,
+  count: countReducer, // etc.
+})
+
+Redux.createStore(rootReducer);
+
+// Adding more data with an action. Actions can have more than just 'type', but other properties too:
+
+const ADD_NOTE = 'ADD_NOTE';
+
+const notesReducer = (state = 'Initial State', action) => {
+  switch (action.type) {
+    case ADD_NOTE:
+      return action.text;
+      break;
+    default: return state;
+  }
+}
+
+const store = Redux.createStore(notesReducer); // here we make the store with the reducer, which is called and has received no arguments, so it creates the store with the default arguments of the reducer (i.e. state = 'Initial State').
+
+const addNoteText = (note) => ({ type: ADD_NOTE, text: note });
+
+store.dispatch(addNoteText('hello!')); // this calls the above function, which returns an object with a type and some data, the data being the argument it was passes, a string 'hello!'. The object returned is passed as an arg to store.dispatch. The store was created with the notesReducer, which receives the obejct. The reducer switches over the action.type and finds it is of ADD_NOTE type, so it returns a new state that contains the action.text, which was the text provided in the object returned from addNoteText. The state here is very simple, just a string only. Maybe this kind of thing would usually return an object.
+
+// Asynchronous actions:
+// Use Redux.applyMiddleware with an argument of ReduxThunk.default as the second argument to Redux.createStore(). To create an asynchronous action, make an action creator that return a function (not an object this time) that takes 'dispatch' as an argument:
+
+const REQUESTING_DATA = 'REQUESTING_DATA'; // set up types
+const RECEIVED_DATA = 'RECEIVED_DATA';     // set up types
+
+const requestingData = () => ({ type: REQUESTING_DATA }); // set up action creators
+const receivedData = () => ({ type: RECEIVED_DATA, data: [/* array of data that was requested */]})
+
+const asynchActionCreator = () => {   // returns a function that calls the
+  return dispatch => {                // action creators above inside a function
+    store.dispatch(requestingData()); // that takes dispatch as an argument
+    store.dispatch(receivedData());   // takes care of async action
+  }
+}
+
+const defaultState = {
+  fetching: false,
+  data: []
+}
+
+const asyncReducer = (state = defaultState, action) => {
+  switch (action.type) {   // reducer: used to set up store
+    case REQUESTING_DATA:  // and switches over the actions
+      return {             // and updates state to either
+        fetching: true,    // be in the process of updating
+        data: [],          // or no longer updating and having
+      }                    // received the data
+      break;
+    case RECEIVED_DATA:
+      return {
+        fetching: false,
+        data: action.data,
+      }
+    default: return state;
+  }
+}
+
+const store = Redux.createStore( // creat the store with the async Reducer
+  asyncReducer,                  // and the middleware as the second arg
+  Redux.applyMiddleware(ReduxThunk.default)
+)
+
+// Creating a counter:
+
+const INCREMENT = 'INCREMENT'; // set up action types
+const DECREMENT = 'DECREMENT'; // set up action types
+
+const counterReducer = (state = 0, action) => {
+  switch (action.type) {   // create reducer with default state as 0 for setup
+    case INCREMENT:        // switch over the action type defined
+      return state + 1;    // the action creators below
+      break;               // return the a new state, not modifying original state
+    case DECREMENT:
+      return state - 1;
+      break;
+    default: return state; // with no state passed in, initialise to default in args
+  }
+};
+
+const incAction = () => ({ type: INCREMENT }); // action creators
+const decAction = () => ({ type: DECREMENT }); // action creators
+
+const store = Redux.createStore( counterReducer ); // set up store
+
+
+// Never Mutate state
+
+// use spread operator to make shallow copies of arrays, or .slice() or .concat(), and return a modified copy of the array from state.
+
+/* ... */ return arrayInState.concat(newValue); /* ... */
+/* ... */ return [...arrayInState, newValue]; /* ... */
+/* ... */ return [...arrayInState.slice(0, action.index), arrayInState.slice(index + 1,)]; /* ... */
+
+// use Object.assign to make shallow copies of objects:
+
+/* ... */ return Object.assign({}, obj1, obj2); /* ... */
+
+
+
+/* --- REACT AND REDUX --- */
+
+
+// React component:
+
+class DisplayMessages extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      input: '',
+      messages: []
+    }
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(e) {
+    this.setState({
+      input: e.currentTarget.value,
+    })
+  }
+
+  handleSubmit() {
+    this.setState({
+      messages: [...this.state.messages, this.state.input],
+      input: '',
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <h2>Type in a new Message:</h2>
+        <input onChange={ this.handleChange } type='text' value={ this.state.input } />
+        <button onClick={ this.handleSubmit } >Add</button>
+        <ul>
+          {this.state.messages.map((message, index) => <li key={ index } >{message}</li>)}
+        </ul>
+      </div>
+    );
+  }
+};
+
+// Redux:
+
+const ADD = 'ADD';
+
+const addMessage = message => ({ type: ADD, message: message });
+
+const messageReducer = (state = [], action) => {
+  switch (action.type) {
+    case ADD:
+      return state.concat(action.message);
+      break;
+    default: return state;
+  }
+}
+
+const store = Redux.createStore(messageReducer);
+
+
+// linking React and Redux:
+
+// use ReactRedux package's Provider component. Provider component takes two props: store={ store } and children = React tree components:
+
+// <Provider store={ store } >
+//   <App />
+// </Provider>
+
+const Provider = ReactRedux.Provider;
+
+class AddWrapper extends React.Component {
+  render() {
+    return (
+      <Provider store={ store }>
+        <DisplayMessages />
+      </Provider>
+    )
+  }
+}
+
+
+// Mapping state to props - creating a function that returns an object with its argument as the value:
+
+const mapStateToProps = state => ({messages: state}); // why do this? I don't know.
+
+// Mapping dispatch to props - creating a function that takes dispatch as an argument. It returns an object with dispatch actions mapped to property names.
+
+const addMessage = (message) => ({ type: 'ADD', message: message }) // action creator
+
+const mapDispatchToProps = dispatch => { // function takes dispatch as arg
+  return {                               // returns a new object
+    submitNewMessage: (message) => {     // key mapped to function as value (function takes arg)
+      dispatch(addMessage(message))      // dispatch the action creator with arg passed to function
+    }
+  }
+}
+
+// written shorthand:
+
+const mapDispatchToProps = dispatch => ({ submitNewMessage: message => dispatch(addMessage(message)) });
+
+
+// Connecting React and Redux:
+
+// use connect method from ReactRedux. Takes two optional args: mapStateToProps and mapDispatchToProps. Both can be replaced with null if not needed, but the connect function must receive two args. Call the result of the function immediately after passing it the arguments, with the new argument of the component to be connected:
+
+const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(ComponentToBeConnected);
+
+// pass connected component into Provider component:
+
+<Provider store={ store } >
+  <ConnectedComponent />
+</Provider>
+
+// render this as the whole app.
+
+
+// Example imports for a ReactRedux app:
+
+// import React from 'react'
+// import ReactDOM from 'react-dom'
+// import { Provider, connect } from 'react-redux'
+// import { createStore, combineReducers, applyMiddleware } from 'redux'
+// import thunk from 'redux-thunk'
+
+// import rootReducer from './redux/reducers'
+// import App from './components/App'
+
+// const store = createStore(
+//   rootReducer,
+//   applyMiddleware(thunk)
+// );
+
+// ReactDOM.render(
+//   <Provider store={store}>
+//     <App/>
+//   </Provider>,
+//   document.getElementById('root')
+// );

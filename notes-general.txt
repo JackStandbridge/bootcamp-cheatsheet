@@ -1,0 +1,10 @@
+never use a space in a file name due to server reasons.
+
+don't use dots: my.file.html
+
+need to install balsamic by Monday.
+
+close things in sublime before moving files to other directories.
+
+don't use w3schools - it is wrong;
+use MDN docs - it is much better;

@@ -1,0 +1,510 @@
+// --- Manipulating Data Structures --- //
+
+let x = { a: 1, b: 2 };
+let y = { a: 1, b: 2 };
+
+console.log( x === y ); // false
+
+let m = [1, 2, 3];
+let o = [1, 2, 3];
+
+console.log( m === o ); // false
+
+
+// arrays and objects that are the same do not equal each other.
+
+// if you assign an array or object to an existing one, it shares the address in memory, and so they evaluate to equal.
+
+let c = [1, 2, 3];
+let d = x;
+
+console.log( c === d ); // true
+
+// modifying d will modify c and they will continue to evaluate to equal. Same for objects.
+
+// Redux just tracks whether something in state has changed by whether it's the same thing as before. If you just update the values of an obj or array, it will still be the same thing. Redux then thinks that nothing has changed and will not update anything.
+
+// a library called Immutable is useful for making sure that nothing is ever modified directly in Redux, and that a new obj/array is always returned.
+
+// --- Object Manipulation --- //
+
+// use spread operator on objects or arrays:
+
+let oldOb = { a: 1, b: 2, c: 3 };
+let newOb = { ...oldOb, b: 456 };
+
+console.log(newOb); // { a: 1, b: 456, c: 3}
+console.log(oldOb === newOb); // false
+
+// even if you think you know the full structure of an object, it's worth putting the spread operator in to make sure that everything is being copied from object to object:
+
+let thirdOb = { ...newOb, a: 2, b: 'hello', c: 49};
+
+// spread operator only makes a shallow copy - first level only. Any data structures in the object or array will still be just references to the same objects or arrays.
+
+let deepOb = {
+  a: 12,
+  b: {
+    c: 4,
+  }
+};
+
+let shallowCopy = {...deepOb};
+
+console.log(deepOb.b === shallowCopy.b); // true -  they still point to the same sub object.
+
+let deepCopy = {...oldOb, b: { ...oldOb.b, c:5 } }; // how to update c in deepOb.
+
+// there is no need to do a deep copy on every element if you are only changing one deep data structure. Do a deep copy of the target, and a shallow copy of the rest of the first layer object, leaving the rest of the deep objects alone.
+
+// Computed property names:
+
+let key = 'example';
+
+let keyOb = {
+  key: 12, // this key is just literally 'key'
+}
+
+let keyOb2 = {
+  [key]: 12, // this key is 'example';
+}
+
+// Deleting a property:
+
+let delOb = { a: 1, b: 2, c: 3 };
+delete delOb.c; // it's not a function, it is a keyword copied from Java. That's why it looks so weird.
+// or use array access syntax:
+let keyToDelete = 'c';
+delete delOb[keyToDelete];
+
+console.log(delOb); // { a: 1, b: 2 }
+
+// to make a new object without a property, copy it first.
+// remember to make a copy that is deep enough to include the thing you are deleting:
+
+let obToCopy = {
+  articles: {
+    1: {
+      key1: 'value1',
+      otherkey1: 'othervalue1'
+    },
+    2: {
+      key2: 'value2',
+      otherkey2: 'othervalue2'
+    },
+    3: {
+      key3: 'value3',
+      otherkey3: 'othervalue3'
+    },
+  }
+}
+
+let copy = {...obToCopy, /* articles: {...obToCopy.articles} */ };
+
+delete copy.articles[1];
+
+console.log(obToCopy); // these are expected to be the same not including
+console.log(copy);     // the commented out code above, but different inluding it
+
+
+// --- Working with Arrays --- //
+
+// .map(), .filter() and .reduce() all return new arrays, so unless there are deep objects that need to be copied, these are safe to use.
+
+// .concat() also returns a new (modified) array.
+
+// use .concat() to add arrays to arrays of arrays:
+
+let concatArr = [[1, 2], [3, 4], [5, 6]];
+
+let newArr = concatArr.concat([[7, 8]]);
+
+console.log(newArr); // [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], [ 7, 8 ] ]
+
+// .concat() also makes a shallow copy, not a deep copy.
+
+// pick either .concat() or the spread operator and stick to it for consistency.
+
+
+// --- Redux --- //
+
+// use yarn add redux to add redux to a project, then import it in the file you need it in.
+
+// We use Redux to separate concerns: UI elements shouldn't have to do any data processing or calculations to do with state. We can pull the data management side of an app out of the React elements. React is then just used for UI, and Redux is for data managment. Meaning that UI elements can be restyled, moved, rewritten, etc, completely independently of all the data management. In addition, the data might need to be displayed differently on different platforms, but if data is pulled out of React, it can be passed to both ReactDOM and ReactNative.
+
+// Redux is independent of React and can be used with other libraries, or even with native DOM.
+
+// Redux consists of 3 parts:
+
+// Store -- keeps track of current state. We can subscribe to it to listen to changes, and we can dispatch actions to it.
+
+// Actions -- simple messages (object literals with a 'type' property) that we dispatch to the store to update the state.
+
+// Reducers -- take an action and transform the current state in some way. Subscribers are notified after updates.
+
+// import:
+
+import { createStore } from 'redux';
+
+// Initial State:
+
+const initial = {
+  value = 1,
+};
+
+// Reducer - automatically called by redux when action is dispatched. First time it is run, it should use default state.
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'increment':
+      return { ...state, value: state.value + 1 };
+    default: return state;
+  }
+}
+
+// Store: pass reducer and initial state as args.
+
+const store = createStore(reducer, initial); // passing initial state saves from having default value in reducer params.
+
+// Subscribing: every time dispatch is called, whether anything changes or not, do something:
+
+store.subscribe(() => {
+  console.log('this function is called every time something changes in the store.');
+  console.log(store.getState().value); // store.getState() returns a copy of the state.
+})
+
+// Dispatching:
+
+store.dispatch({ type: 'increment' });
+
+// calling an action that doesn't exists, it doesn't completely break the app:
+
+store.dispatch({ type: 'decrement' }); // does nothing at the moment, because there is no handling for a decrement action in the reducer.
+
+// Redux Chrome plugin: 'Redux Dev Tools'
+
+const store = createStore(
+  reducer,
+  initial,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+  // checks if the devtools exists, then calls them if they do.
+)
+
+// don't make display components figure out things that aren't display related.
+
+
+// --- REACT REDUX --- //
+
+// acheives something very similar to the Context API which came out recently.
+
+// helps Redux communicate with React without having to pass props and event handlers down many layers of nested components. We give ReactRedux access to the store so that it can use store.getState() and store.dispatch().
+
+import { Provider } from 'react-redux';
+
+// this is a React component called Provider, which is provided by react-redux.
+
+// wrap the entire app (including Routers) in the Provider component:
+
+<Provider store={ store } >
+  <Router>
+    <App />
+  </Router>
+</Provider>
+
+// pass it the store as the props store: 'store={ store }'
+
+
+// --- mapStateToProps --- //
+
+// a way to convert the state in a Redux store to props that can be passed to connected components.
+
+// container: wraps a component that already exists. It is common to have something like Form.jsx for the presentational element and Form.js for the container element that passes props to the presentational element. The container component has direct access to Redux, and can pass props along.
+
+// making a container and using connect() and mapStateToProps creates new component that wraps the presentational component (e.g. connect(mapStateToProps)(Articles) ), but which has access to the props that you pass it from the store. The presentational component is still displayed, but is wrapped with the new component (as is visible in the DOM structure in the React dev tools).
+
+// imagine a store set up with this initial state:
+
+const initial = {
+  articles: {
+    first: {
+      title: 'slkjfd',
+      body: 'sdlfkjsdflkj',
+      tags: ['sldfj', 'sdflkj', 'slkjsdf'],
+    }
+    second: {
+      /* ... */
+    }
+    /* ... */
+  }
+}
+
+// we could just take part of the state, like the first article like this:
+
+const mapStateToProps = state => ({article: state.articles.first});
+
+// then we can use connect to make a connected component:
+
+import Article from './components/Article'; // <- this is probably a jsx containing component (or presentational)
+
+export default connect(mapStateToProps, null)(Article); // <- this exports a connected version of the Article component
+
+// this probably all takes place in a containers folder that has the same structure as the components folder. The folder structure is the same, and each presentational component that would need props passed to it is represented by a connected counterpart, which is the version which is in the containers folder.
+
+// mapStateToProps can accept two arguments:
+
+const mapStateToProps = (state, props) => ({ article: state.articles[props.id] });
+
+// it can accept, for example, information about the routing:
+
+<App>
+  <Route>               {/* this Route may pass down props */}
+    <ArticleContainer>  {/* state comes in here, but props are passed down from above */}
+      <Article />       {/* this may be conditionally rendered based on the information from the Route */}
+    </ArticleContainer>
+  </Route>
+</App>
+
+// here the Route could pass information about the url with match.params down as props. The article container can then receive the information as props, which it can use to select the correct article.
+
+// --- mapDispatchToProps --- //
+
+// mapDispatchToProps takes an argument called dispatch, returns an object which contains a key value pair where the value is an anonymous function that calls dispatch with an action (object of the correct type). This anonymous function can take an argument that is used in the action dispatched if needed.
+
+import { connect } from 'react-redux';
+
+import Add from '../../components/Articles/Add';
+
+const mapDispatchToProps = dispatch => ({
+  onSubmit: () => dispatch({ type: 'addArticle' }), // or use an action creator from actions.js
+})
+
+export default connect(null, mapDispatchToProps)(Add);
+
+
+// --- RESTful APIs --- //
+
+// HTTP: Hypertext Transfrer Protocol - how information is transferred from and to and between servers and computers.
+
+// an http request needs: a method (like GET or POST), the URI fragment, HTTP version, host name, etc
+
+// HTTP methods: OPTIONS, GET, POST, HEAD, PUT, DELETE, TRACE, CONNECT
+
+// use 'curl -i http://example.com' to see the response for any page.
+
+// Status codes:
+
+// 2xx: Success
+// 200: OK
+// 201: Created
+// 204: No Content - everything worked, but nothing to return
+
+// 3xx: Redirect
+
+// 4xx: Client Error
+// 400: Bad Request
+// 401: Unauthorised
+// 403: Forbidden
+// 404: Not Found
+// 405: Method Not Allowed
+// 422: Unprocessable Entity
+// 429: Too Many Requests
+
+// 5xx: Server Error
+
+// 400 errors need to be dealt with by you if you are building the client side (java script) end.
+
+// API: Application Programming Interface - allows programs to talk to each other. Programs are stupid and can only deal with things they expect, so APIs need to be well-defined, predictable and well documented.
+
+// RESTful APIs: Representional State Transfer. Send data using JSON and using HTTP, using the already established HTTP methods/status codes.
+
+// JSON: can send things with the format of JS objects, and can use JS types, but can't do any calculations. Have to use double quotes around the keynames:
+
+{
+  "people": [
+    {
+      "name": "bob" /* ... */
+    }, {
+      "name": "alice" /* ... */
+    }
+  ]
+}
+
+// can't have end commas in arrays or objects. Last entry must be followed by closing brackets.
+
+// restful uses http methods:
+// GET: just for displaying data on server, never update db, or change anything
+// POST: create new things, not updating
+// PUT: updating things, not creating new things (have to send all data again, even if only updating a little bit of it)
+// PATCH: updating parts of things without having to send everything again
+// DELETE: deleting things
+
+// GET /articles: show all articles
+// POST /articles: create a new article
+// GET /articles/1: show article with id of 1
+// PUT /articles/1: update article with id of 1
+// DELETE /articles/1: delete article with id of 1
+// GET /articles/1/comments: show the comments for an article with the id of 1
+
+// ^^ this url structure only makes sense with APIs, not browsers ^^ //
+
+// Postman:
+
+// Postman is a free Chrome app to test RESTful APIs.
+
+// for Mac there is a better (paid) program called Paw.
+
+// using Postman:
+
+// make sure to set Accept: application/json header
+// use 'raw' and then 'JSON (application/json)' for the Body
+// use Collections to save routes you're likely to use more than once
+
+
+// my data:
+{
+    "uri": "http://jack.restful.training/api/",
+    "api_key": "9ee1cc2015c5092aed9a27d86b10cb8ce435f152"
+}
+
+
+// --- AJAX --- //
+
+// Asynchronous JavaScript and XML - even though it doesn't use XML any more.
+
+// Axios: library designed for making doing HTTP requests easy.
+
+// install Axios with 'yarn add axios'
+
+axios.get("/articles");
+
+axios.post("/articles", {
+  title: "Hello",
+  article: "blah blah blah",
+  tags: ["fish", "cat", "spoon"],
+});
+
+axios.put("/articles/5", {
+  title: 'hello again',
+  article: 'blah blah blah',
+  tags: ['fish', 'cat'],
+});
+
+axios.delete('/articles/4');
+
+// don't need to make perfect JSON, normal JS objects are fine.
+
+export default axios.create({
+  baseURL: 'http://jack.resfult.training/api',
+
+  params: {'key': '9ee1cc2015c5092aed9a27d86b10cb8ce435f152'},
+
+  headers: {'Accept': 'application/json'},
+});
+
+// this makes it so that you don't have to repeat all the above information with each request. Make this in a separate file, export it and import it into the place you're using AJAX.
+
+// using axios.get() and console logging out the result will log a Promise type object, because it hasn't received the information back yet.
+
+// Promises:
+
+let promise = axios.get('/articles');
+
+promise.then(response => {
+  console.log(response);
+});
+
+// generally we can chain promises:
+
+axios.get('/articles').then(({ data }) => {
+  console.log(data);
+})
+
+// if you have multiple promises, there is no guarantee that the first ones will execute first. It is based on the server and the server may process different requests at different speeds.
+
+// Errors:
+
+// if you get a 400 or 500 status code, the repsonse (the bit inside .then()), pass a second arg to .then(), which is a callback that accepts the argument 'error':
+
+axios.get('/articles').then(response => {
+  console.log('Everything worked');
+}), error => {
+  console.log(error);
+  console.log(error.response);
+  console.log('there was an error')
+}
+
+// or, put a .catch() at the end of the chain:
+
+axios.get('/articles').then(response => {
+  console.log('Everything worked');
+}).catch(error => {
+  console.log(error);
+  console.log(error.response);
+  console.log('there was an error')
+})
+
+// where do we put API actions in a react/redux app?
+
+// Not components - they handle data only
+// Not containers - they are just for hooking things into Redux
+// Not reducers - they need to return state immediately, so can't be async
+// So it must be in the action creators!
+
+// we will use Redux Thunk. It is the simplest way to do it, but probably not the best way. For bigger apps, Redux Thunk is not ideal.
+
+// we have regular actions creators that update state, and we have API action creators.
+// dispatch now has two meanings: dispatching to the store and dispatching to the server.
+// server dispatches will send data to the server, await a response, then dispatch to the store with the updated info.
+// split actions into two files, both in the actions folder. One called state.js, one called api.js
+
+// we need to add Redux Thunk as middleware when we create the store. Using more than one piece of middleware, we need to import applyMiddleWare and compose from redux. Import thunk from 'redux-thunk'. Then:
+
+const composeEnhancers = window.___REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = {
+  reducer,
+  initial,
+  applyMiddleWare() // ******* notes not complete ********
+}
+
+
+// Once it is working, we can do something like this, a function that returns a function:
+
+export const getArticle = id => dispatch => {
+  // first dispatch an API request:
+  axios.get(`/articles/${id}`).then(({ data }) => {
+
+    const article = data.data;
+    // next, the regular action that updates the state:
+    dispatch(addArticle(article));
+  })
+}
+
+// use 'yarn add redux-thunk' to install Redux Thunk.
+
+// put axios.js in the data folder, and make sure to have run 'yarn add axios' in the project directory.
+
+// name api actions with the api method: getTitles, postArticle, patchComments, deleteTag etc., but use different names for state actions: listTitles, addArticle, updateComments, removeTag etc.
+
+// have to convert functional components to class based components when using AJAX so that React lifecycle methods can be used. Use the componentDidMount() method to make something happen each time a component appears on screen.
+
+componentDidUpdate(prevProps, prevState) {
+  if (this.props.foo !== prevProps.foo) {
+    // do something
+  }
+}
+
+// componentDidUpdate is passed the previous props and previous state. It is useful for checking if the new props or state are the same as the previous ones. It is called every time the render method is called.
+
+shouldComponentUpdate(newProps, newState) {
+  return false;
+}
+
+// shouldComponentUpdate is called before every render method and is used to cancel render methods. Return a boolean to allow or disallow the render method to run.
+
+// order of things happening in an api calling redux app:
+
+// component
+// container
+// api action
+// state action
+// reducer

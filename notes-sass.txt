@@ -1,0 +1,66 @@
+%default-background {
+  background: green;
+}
+.header-main {
+  @extend %default-background;
+}
+.button {
+  @extend %default-background;
+}
+
+built in functions - read sass documentation
+e.g. lighten(green, 10%) / darken() / saturate()
+
+you can do maths
+width: 100px + $padding;
+
+mixins are sass's functions, a bit like extends, but they take parameters
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+     -moz-border-radius: $radius;
+          border-radius: $radius;
+}
+
+.box { @include border-radius(10px); }
+
+importing other files:
+@import 'reset.css';
+@import '_settings.scss';
+
+have lots of files: typography, spacing, elements, features, sections, structure etc.
+
+watching a scss file
+in terminal type: sass --watch input.scss:output.css
+
+e.g.
+sass --watch grid.scss:main.css
+
+
+----- OOCSS -----
+Object Oriented CSS -
+separate concerns, reusable css
+
+----- Atomic Design -----
+a way to look at components you are styling
+breaking elements down further and further
+
+Atoms: Elements (imput, p, button etc.)
+Molecules: Set of elements (search form)
+Organism: Set of melocules (site header)
+Templates: Set of organisms(repeated)
+Pages: Final site
+
+----- BEM -----
+Block Element Modifier
+
+/* this is the block */
+.block {}
+
+/* This is an element that helps to form the block as a whole */
+.block__element {}
+
+/* This modifies the element or block */
+.block--modifier {}
+
+----- SMACSS -----
+Scalable and modular architechure for css

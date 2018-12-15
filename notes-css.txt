@@ -1,0 +1,305 @@
+------------------ CSS ------------------
+
+url('something.jpg') is a css function call because of the brackets
+
+box-shadow: 1px 2px 3px 4px grey;
+/* 1 is x axis, 2 is y, 3 is blur, 4 is spread */
+
+any element in another: article header {}
+direct child element:   article > header {}
+
+what does a colour function return? Do rgba() and hsla() return hex values?
+
+user agent stylesheet means the browser window. This is displayed in the devtools to show the source of the stylesheet if there is none linked.
+
+go to devtools to bugfix css. Something incorrect will be struck through and puts a warning triangle next to it.
+
+all html elements have default set of styles.
+
+padding on display: inline doesn't move things up and down. Using display: inline-block will allow for this.
+
+FLOAT takes the elements out of the normal flow, so containing elements collapse if there's nothing else in them.
+
+display: flow-root; will make a container re-examine the children and re-calculate its own size to contain floated elements.
+
+overflow: auto; does similar to flow-root.
+
+don't ever use height, always have them be dictated by the content.
+
+read this article on css layout: https://www.smashingmagazine.com/2018/05/guide-css-layout/
+
+display: inline-block; takes its properties to be similar to inline elements in text, meaning if you have inline-block divs they will always have a 'space character' width between them unless you write them <div></div><div></div> right next to each other or comment out the whitespace between them.
+
+pixels as a measurement are probably good for icons or small things, but not really full sites.
+
+percentages are much better for whole pages.
+
+vw is viewport width
+vh is viewport height
+vmin is the smaller of height or width
+vmax is the larger of height or width
+
+all of the above are measured in 100=max.
+
+ex - height of x
+ch - width of 0
+lh - line-height
+pt = point (1/72")
+mm - mm
+cm - cm
+
+
+order css to be more unique and specific as it goes down the page.
+
+generic/layout stuff at the top, specific towards the bottom.
+
+reset: https://meyerweb.com/eric/tools/css/reset/
+
+
+----------RESPONSIVE DESIGN----------
+
+adaptive design is sending different files for different devices.
+
+responsive design is adjusting the content based on the device.
+
+use relative not absolute units.
+
+use css media queries.
+
+@media only screen and (max-width: 500px) {
+  /* code */
+}
+
+js can add the class name to the body based on device detection
+
+
+----------FLEXBOX----------
+
+justify-content: space-around/space-between/space-evenly/flex-start/flex-end;
+align-content:        "            "             "           "          "   ;
+align-items: stretch "   " ...;
+flex-wrap: wrap/nowrap/wrap-reverse;
+
+flex-box can squash things down to smaller than their own width rather than overlapping them.
+
+
+----------WEB FONTS----------
+
+if including font files, make sure to google the type (ttf. otf. etc.)
+
+What The Font app can match photos you upload and tell you what it is.
+
+keep font files in a 'fonts' folder in your project folder.
+
+use:
+
+@font-face {
+  font-family: 'Gotham'; /* (user defined) */
+  font-weight: normal;
+  src: url('../fonts/cotham-book.otf') format('opentype');
+        /* google the format bit to be sure */
+        /* be sure to reference from the css folder: ../fonts */
+}
+
+comprehensive font face:
+
+@font-face {
+  font-family: 'fontName';
+  src: url('filename.eot'); /* IE9 Compat Modes */
+  src: url('filename.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('filename.woff2') format('woff2'), /* Super Modern Browsers */
+       url('filename.woff') format('woff'), /* Pretty Modern Browsers */
+       url('filename.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('filename.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
+
+basic font face:
+
+@font-face {
+  font-family: 'fontname';
+  src: url('filename.woff2') format('woff2'),
+       url('filename.woff') format('woff'),
+       url('filename.ttf') format('truetype');
+}
+
+articles: css-tricks.com/fout-foit-foft/
+          css-tricks.com/snippets/css/system-font-stack/
+
+may be better to serve a font if it's from a smaller infrastructure source
+
+if it's just from Google or something, probably fine to just link it
+
+don't put unit on line-height. Use something between 1.3 and 1.8.
+
+
+----------FORMS----------
+
+action attribute is usually the location the data from the form is sent.
+
+method attribute is GET or POST.
+
+name attribute is for PHP to know what things are
+
+type attribute is for validation of the input
+
+text/password/textarea/number/email/tel/submit/radio/checkbox/range/url
+
+select/option makes dropdowns.
+
+give radio buttons the same name attribute
+
+use 'checked' to make radio or checkboxes checked by default.
+
+date/datetime-local/day/week/month/time
+
+file/search/hidden/color/button/reset
+
+search doesn't have search functionality, but will remember past search term.
+
+hidden value attribute can be filled with something that you want to post with the form that the user doesn't need to know about.
+
+range uses min and max and value, which is the start, step is the amount it clicks when sliding
+
+color brings up a color picker.
+
+button attribute makes a form field look like a button. Why? No reason.
+
+reset gets rid of everything. Don't use it. Very annoying.
+
+
+----------DISPLAY----------
+
+css order for good style:
+
+-display
+
+-style
+
+-font
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+  margin: 40px;
+
+  background: lightgrey;
+  border: 2px solid darkgrey;
+  border-radius: 5px;
+
+  font-size: 1.3rem;
+  color: black;
+
+  other: misc properties.
+}
+
+always write font names in quotes.
+
+width: value;
+height: auto;
+
+/* doesn't work in a flexbox. */
+
+height percentage is based on the width unit.
+
+
+----------ACCESSIBILITY----------
+
+40px is min size for a button in terms of accessiblity.
+
+Sight/Hearing/Learning difficulties/Mobility difficulties/Colour blindness/injury
+
+use the right element for the right content
+
+check design is accessible
+
+make sure that video is captioned.
+
+make buttons big enough
+
+keep things free of clutter and busy animations
+
+keep words per line to ~20, and keep font size big enough
+
+don't use ONLY colour as feedback. i.e. red or green border on a correct of incorrect form field, put a cross too.
+
+make your site zoomable
+
+don't use images as text, or if you do, make sure you have alt text. Only use images as text if you have to.
+
+aria-attributes give screen readers prompts. They are for giving more information about elements, e.g. display: hidden; elements aren't read by screen readers
+
+<span id='submit-label' hidden> Submit</span>
+<button type='submit aria-labelledby='submit-label'> some icon here </button>
+
+----------NEAT TRICKS----------
+:root {
+  font-size: calc(10px + .5vmin);
+}
+
+
+cool colour stuff to fiddle with:
+
+filter:
+  blur;
+  contrast;
+  brightness;
+  greyscale;
+  saturate;
+
+mix-blend-mode:
+  multiply;
+  screen;
+  lighten;
+  darken;
+  hue;
+  saturation;
+  luminosity;
+  color;
+  soft-light;
+  difference;
+
+youmightnotneedjs.com
+
+@supports (display: grid) {
+  container {
+  display: grid
+  }
+  etc. etc.
+}
+
+
+------- EXTRAS -------
+cursor: pointer;
+list-style: none;
+
+@keyframes move {
+  0% {
+    transform: translate(0px, 0px)
+  }
+  100% {
+    transform: translate(50px, 50px)
+  }
+}
+
+button {
+  animatino: move 1s ease-in-out infinite;
+}
+
+h1 {
+  mix-blend-mode: screen;
+}
+
+image {
+  filter: blur(1px) hue-rotate(90deg);
+}
+
+:root {
+  --brandCol: red;
+}
+p {
+  color: var(--brandCol);
+}
+
+links:
+https://github.com/develop-me/fellowship-wk2-adv-html-css/tree/master/day08/02coolCSS

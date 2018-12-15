@@ -1,0 +1,272 @@
+using map is common in React to access values in an object.
+
+let people = [{ name: 'Alice'}, {name: 'Malcolm'}];
+people.map(x => x.name); // ['Alice', 'Malcolm']
+
+when returning a boolean, think about whether you can just return !testCondition:
+
+i.e. return !!x, or return x, or return !x
+
+--- REACT ---
+
+not a framework because it doesn't offer ways to do all aspects
+it only interacts with rendering HTML and DOM events, no talking to APIs or data management
+it is a view library
+
+We will also use: ReactRouter, Redux, Axios
+
+When to use React: for complicated web-APPS, not for webSITES. It is for highly interactive things.
+
+300-400kb of JS is needed for React, Redux and the rest.
+
+use create-react-app to make a new React app in the directory you are in.
+
+--- JSX ---
+
+templating language
+
+any empty tag should self close in JSX: <div className='weird-empty-div' /> // this is not valid HTML, but is valid JSX
+
+components in JSX always start with a capital letter: Header.js
+
+use 'export default {ComponentName};' to export components.
+
+use 'import {ComponentName} from "{FileName}";' to import components.
+
+if it's a local file, you must give it a relative pathname: './Header.js'
+
+.toLocaleString('en-GB', {style: 'currency', currency: 'GBP'}); // formats a number as currency.
+
+use '<React.Fragment>' to contain top level components to avoid having multiple useless container divs.
+
+<React.Fragment> can be replaced by <>, and closed with </>
+
+using {} as the properties in html, only use the {}, no quotation marks.
+
+
+--- PROPS ---
+
+props is an object literal passed in as an argument and access them with dot notation: props.example
+
+it is common to use destructuring in the argument accepting props to open up the object and better display what is coming in:
+
+const Figure = ({ caption, src }) => (
+  // code here
+)
+
+one-way data flow: parents pass props to children, but not the other way round.
+
+pass props in {} unless it's simply a raw string.
+
+can't put a statement (like an if statement) in JSX, which is why it's usefull to use ternary operators to evaluate props within the JSX.
+
+line breaks in JSX do not equate to a space whereas an amount of white space in HTML equates to one space.
+
+The 'children' Prop:
+
+<Header>Title</Header> // anything between opening and closing JSX tags gets passed in as a special prop called 'children';
+
+const Header = ({children, subtitle}) => {
+  // can access 'children' as variable here
+  // it is whatever is between the start
+  // and end of a non-self-closing JSX element
+  // sub title is passed in as a normal prop
+  // i.e. like an HTML attribute.
+}
+
+can put anything in as children - other components, strings, entire page structure, etc.
+
+use { example, example, children } deconstructing as a standard.
+
+
+Default Props:
+
+Figure.defaultProps = {
+  caption: 'A caption',
+  src: 'Https://google.com/images/default+image'
+};
+
+// must be defined outside the function.
+
+
+--- STATE ---
+
+Events:
+
+no need to use selectors or getElementsBy ... : just add directly to the JSX.
+
+const App = () => (
+  <header
+    className='jumbotron'
+    onClick={ () => console.log('clicked!') }
+  >
+    <h1>Click me</h1>
+  </header>
+)
+
+pretty much all of the addEventListener() events work but with onEvent style formatting.
+
+let { children, subtitle } = this.props // use destructuring to extract the props inside a render method.
+
+stateful component:
+
+class Example extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      counter: 0,
+    }
+  }
+
+  handleClick() {
+    let newCounter = this.state.counter + 1;
+    this.setState({
+      counter: newCounter
+    });
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  // OR //
+
+  handleClick() {
+    this.setState(({ counter }) => {
+      counter: counter + 1
+    })
+  }
+
+  render() {
+    return (
+      // JSX
+    )
+  }
+}
+
+
+only call this.setState() once inside an event handler, never call it more than once, because it only actually takes place after the event handler finishes. (though it will work if you pass it a function, as in second example above).
+
+Bind event handlers or you will get error: cannot read property 'setState' of undefined.
+
+if something doesn't change, it doesn't need to be in state
+if you can calculate it from other things, it doesn't need to be in state
+
+use arrays to keep track of previous values
+use booleans to keep track of something with only two possible values
+
+shape of state: the structure of the state - what is kept track of, how best to do it, etc.
+
+
+--- LIFTING STATE ---
+
+sibling elements, or child elements are completely unaware of each other's state, or of their parents state.
+
+lifting the state to the parent lets you pull state from children.
+
+the functions from the child elements should also be lifted along with the state if they relied on the state in the child.
+
+...this.props will pass along all props that a component was given in the same way that they were received.
+
+not covering context API, but it's worth looking into in the context of React/Redux.
+
+
+--- FORMS ---
+
+when do you need constructor and super(props) ? only need to have the constructor if there is anything else in the constructor, as inheritance sorts out calling the constructor and super(props) if it is not called.
+why do we use onChange and not onInput?  -- it's a React catch all
+
+accept event object in event handler just like with accepting events in event delegation with the DOM, but must use event.currentTarget to get the element the event handler was called from. Just using event.target may give you the child element as the event.
+
+handleChange(e) {
+  this.setState({ input: e.currentTarget.value })
+}
+
+
+--- REACTROUTER ---
+
+ReactRouter is the process of taking a URL and deciding what code should run.
+
+users should be able to navigate to different pages to view different content - this is where ReactRouter helps.
+
+e.g. if user goes to app.dev.login, they should see the login page rather than anything else.
+
+ReactRouter is a library for doing this.
+
+use 'yarn add react-router-dom' or 'npm install react-router-dom'
+
+then update App.js to use routing:
+
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch
+} from 'react-router-dom';
+
+const App = () => (
+  <Router>
+    <React.Fragment>
+    <Header />
+     // ... etc.
+    </React.Fragment>
+  </Router>
+)
+
+import Browser Router and Route, and wrap everything, including containing divs or react fragments etc. in the <Router> element ( which doesn't create a DOM element )
+
+
+Routes:
+
+a mapping between a URL and a piece of code to run.
+
+make a route like this: <Route exact path='/' component={ Buttons } /> // in this case you need to write 'exact', because it is the root route.
+
+exact means it is only what is contained in the quotes, but no exact means that it is any url starting that way.
+
+Things not in a route will always show
+
+to pass props to a component called by a route:
+
+<Route path='/example' render{ () => <Figure props={ props } } />
+
+use render{ () => <Component /> } to add props
+
+
+Matches:
+
+<Route path='/articles/:id' render={ ({ match }) => (
+  <Article article={ match.params.id } />
+)}
+
+matching allows us to match pages with urls that we don't have to explicitly declare
+
+pass an object to render called match, and match.params.**example** gives us whatever is in the **example** wildcard defined in the path
+
+this gets passed through as a prop to the component.
+
+
+Links:
+
+import Link from ReactRouter
+
+if you put a normal link, everything on the whole page reloads, which would wipe all state as the entire page is navigated away from to go to the link, even if it's an internal link.
+
+use a link component: <Link to='/cats'>Cats!</Link> // or 'Router.Link' if you haven't imported it.
+
+
+404s:
+
+import Switch from ReactRouter
+
+wrap all components with Switch component:
+
+const App = () => (
+  <Router>
+    <React.Fragment>
+    <Header />
+    <Switch>
+      <Route path='/example' component={ Example } />
+      <Route exact path='/' component={ Main } />
+      <Route component={ FourOhFour } />
+      // the last route with no path becomes the default if none of the others match
+    </React.Fragment>
+  </Router>
+)

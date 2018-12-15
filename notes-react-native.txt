@@ -1,0 +1,449 @@
+// https://github.com/studiozeffa/react-native-training-course -- notes for this week.
+
+
+// smartphone OSs expose APIs for the app to have access to the hardware on the phone, i.e. access to the camera.
+
+// apps can be split into 3 types: native, web, hybrid
+
+// Native apps:
+
+// built in the native language of the OS: Swift or Objective C for iOS, Java or Cotlin for Android and C# for Windows Phone.
+
+// Now there are cross platform options like React Native. Has the best user experience.
+
+// Web apps:
+
+// regular web pages designed to work on small screens. Written with html css and js, just like any other kind of website. Accessed through the browser.
+
+// will never be as performant as native apps, because everything must go through the browser before it has access to any of the phone's APIs. Simple web presence, run on any device.
+
+// no App Store presence.
+
+// Hybrid apps:
+
+// written with html css and js, app is wrapped in a full screen webview, so looks like a native app, but has been built with web technologies. Very difficult to make as performant as a real native app. Good for form heavy apps, because of html controls.
+
+// React Native only supports iOS and Android, but they make up 99.7% of the user base.
+
+
+// --- React Native --- //
+
+// React Native is not rendering html, css etc., but native components rendered in the same way that React DOM would render html components. View layer is compiled down to Swift/Objective-C on iOS or Java on Android.
+
+// all JSX is compiled down to native UI, wherease anything that is just JS (business logic) is kept the same, meaning we can use any other JS library to assist the business logic.
+
+// we will use Expo to develop:
+
+// Expo consises of CLI - command line interface
+
+
+import React from 'react';
+import { Text, View } from 'react-native';
+
+class Example extends React.Component {
+  render() {
+    return (
+      <View>
+        <Text>
+          These elements are converted on the device to the native OS code!
+        </Text>
+        <Text>
+          You just use elements like View and Text instead of div and span!
+        </Text>
+      </View>
+    )
+  }
+}
+
+// setup:
+
+// install node - runs the js
+// install watchman - watches for file changes
+// install chrome - to connect to app for debugging purposes
+// install Expo on mobile device
+// install Expo CLI in terminal - $ npm install -g expo-cli
+// run in folder to create new app: $ expo init sample-app
+
+// device needs to be on the same wifi as the laptop, scan the QR code with camera and then open in Expo.
+
+// change splash.png and icon.png in the assets folder to change the splash screen and the icon for the app
+
+// edit app.json to change metadata
+
+// in App.js, export the app component. This is the same way that you use ReactDOM.render().
+
+// in stylesheet, flex: 1, means it takes up that proportion of the remaining available space.
+
+
+// Components:
+
+// components must be imported:
+
+import { View, Text, StyleSheet } from 'react-native';
+
+// a View is like a div, a generic container. It can be styled and it can hold other components.
+
+const style = { /* ... */ };
+return (
+  <View style={ style }>
+    <Text>I'm text in a View!</Text>
+  </View>
+)
+
+// Styles and StyleSheets:
+
+// use the StyleSheet API to make a stylesheet object:
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})
+
+// StyleSheet.create accepts a single object with key value pairs.
+
+// styles are largely the same as CSS but with camelCase instaed of kebab-case.
+
+// styles almost never cascade. Child components do not inherit styles from parents.
+
+// layout:
+
+// uses a system called Yoga, very similar to flexbox.
+
+// but, the default flex direction is vertical instead of horizontal.
+
+// there is no other type of display other than Yoga, so you don't set it.
+
+// the 'flex' property indicates the ratio of the screen that is taken up. 2 elements with flex: 1, if on their own, would take up half of the space each, as would 2 elements with flex: 2, or with flex: .5. 2 elements with flex: .25 would each sum to fill half the screen.
+
+// when laying out, just use numbers: 100, 50, etc. These do not indicate pixels strictly, but they can be considered equivalent. These numbers are DIPs - Device Independant Pixels.
+
+// use an array as the value to the style prop to add multiple styles:
+
+<View style={[styles.box, styles.primary]} />
+
+const styles = StyleSheet.create({
+
+  box: {
+    height: 100,
+    width: 100,
+    margin: 10,
+  }
+
+  primary: {
+    backgroundColor: 'red',
+  }
+
+})
+
+// dynamic styles:
+
+const Box = ({ color }) => (
+  <View style={[styles.box, { backgroundColor: color } ]} />
+)
+
+// always declare styles outside of components.
+
+
+// Text
+
+// the only exception to the rule that components don't wrap when meeting the end of the screen. They also cascade their styles to child text components. In this way, we can use <Text>...</Text> as a span and just add one more property to the children.
+
+// fonts default to Sanfrancisco on iOS and Roboto on Android.
+
+// ScrollView
+
+// use a ScrollView to make the contents scrollable.
+
+import { ScrollView } from 'react-native';
+
+<ScrollView contentContainerStyle={ styles.container } >
+
+</ScrollView>
+
+// may have to use contentContainerStyle to set the style on a ScrollView.
+
+// Images
+
+import image from './resources/image.png';
+import { Image } from 'react-native';
+
+<Image source={ image } />
+
+// set the source prop to be equal to the image to display.
+
+// to support higher resolutions, provide different sizes of images:
+
+// image.png     - normal size
+// image@2x.png  - two times size
+// image@3x.png  - three times size
+
+// react native will then choose the right image for the size of device you're on.
+
+// you need to create the different sizes of images.
+
+// remote images:
+
+// set source prop to an object:
+
+const source = {
+  uri: 'http://imageurl.example'
+};
+
+const style = {
+  height: 150,
+  width: 300,
+}
+
+<Image source={ source } style={ style } />
+
+// need to specify height and width on remote images or it will display nothing.
+
+// Buttons:
+
+// buttons can be made with either TouchableHighlight, or TouchableOpacity.
+
+// add an onPress prop to pass a function that will receive an event object.
+
+// TouchableHighlight:
+
+// a button that changes the colour of its background when it is tapped. Best used for block sized buttons where you want the background to change colour.
+
+// TouchableOpacity:
+
+// a button that changes the opacity of the button's contents, and keeps the background colour the same.
+
+<TouchableHighlight style={ styles.button } underlayColor='#9f9f9f'> onPress={ this.onPress }>
+  <Contents />
+</TouchableHighlight>
+
+<TouchableOpacity activeOpacity={0.5} onPress={ this.onPress }>
+  <Image style={ styles.icon } source={ icon } />
+</TouchableOpacity>
+
+
+// Android Studio: xcode equivalent for Android. Can be used to simulate Android devices.
+
+// Test Flight lets you share apps without them being on the App Store.
+
+// Debugging:
+
+// press cmd + D, click remote debugging, then do stuff in Chrome devtools
+
+// React Native debugger - a mix of Chrome devtools, React devtools and Redux devtools.
+
+
+// --- Navigating Between Screens --- //
+
+// $ yarn add react-navigation
+
+// use library called React Navigation. Not the only way to do it, but it is the most popular library.
+
+// mobile apps use navigation stack to navigate between pages. New pages are 'pushed' onto the stack, and when you go back, the front page is 'popped' off the stack.
+
+// set up a StackNavigator, which defines the different screens to navigate between. Similar to ReactRouter, but without using urls to navigate to screens. Each screen will be automatically rendered with a header bar. The render method affects only what is below the header bar.
+
+// each screen is automatically passed a 'naviation' prop, in the same way that ReactRouter gets 'match'.
+
+import { View, Text } from 'react-native';
+import { createStackNavigator } from 'react-navigation';
+
+const HomeScreen = () => (
+  <View><Text>This is the home screen!</Text></View>
+)
+
+const InfoScreen = () => (
+  <View><Text>This is the info screen!</Text></View>
+)
+
+const RootNavigator = createStackNavigator({
+  Home: HomeScreen, // defaults to first screen that is loaded by the app on load.
+  Info: InfoScreen,
+});
+
+export default RootNavigator;
+
+// edit header bar like this:
+
+HomeScreen.navigationOptions = {
+  title: 'Home',
+  headerStyle: {
+    backgroundColor: '#68aa63',
+  },
+  headerTintColor: '#ffffff',
+}
+
+// define this right under the component itself.
+
+// if you're working with a class based component:
+
+class HomeScreen extends Component {
+  static navigationOptions = {
+    title: 'Home',
+    headerStyle: {
+      ...
+    },
+    ...
+  }
+}
+
+// define the navigation options with the static key word. Static methods are available without having to instantiate the class. You don't have to make a new instance of the class before accessing methods. Static methods don't have access to 'this', because 'this' points to the instance of the class.
+
+// that means you can set default props like this:
+
+static defaultProps = {
+  ...
+}
+
+// cool!
+
+// on iOS, the status bar is part of the app itself, whereas on Android, the app is below the status bar, and you can't affect it. If you edit the header bar to be darker, the status bar text will be too low contrast. Edit it like this:
+
+import { StatusBar } from 'react-native';
+
+StatusBar.setBarStyle('light-content');
+
+// this effect is app wide, so it's best to put it in App.js
+
+
+// navigating:
+
+// everything in createStackNavigator gets passed a prop called navigation
+
+onPress() {
+  this.props.navigation.navigate('Info') // this takes us to the Info screen as defined above.
+}
+
+// pass info to the new screen like this:
+
+onPress() {
+  this.props.navigation.navigate('Info', {
+    body: 'This is the Info Screen',
+    title: 'Info'
+  })
+}
+
+// the Info screen can access it like this:
+
+const infoReceived = this.props.navigation.getParam('body');
+
+// navigationOptions object can access this info too:
+
+InfoScreen.navigationOptions = ({ navigation }) => ({
+  title: navigation.getParam('title')
+})
+
+// make navigationOptions a function that returns an object. This func receives an object with a key of navigation
+
+
+// to apply global header bar styles:
+
+const RootNavigator = createStackNavigator({
+  Home: HomeScreen,
+  Info: InfoScreen
+}, {
+  defaultNavigationOptions: {
+    headerStyle: {
+      backgroundColor: '#68aa63',
+    },
+    headerTintColor: '#ffffff',
+  },
+})
+
+// pass a second object as an arg to createStackNavigator, that is an object that contains a key of navigationOptions and a value of an object. This one never needs to return a function because it's just a static style, not dynamic.
+
+// --- List Detail --- //
+
+// we can map over an array of items and put the resulting views inside a ScrollView to make a scrollable list.
+
+// this is so common, you can use a dedicated component for this: FlatList
+
+import { FlatList } from 'react-native';
+
+/* ... */
+
+  renderItem({ item }) {
+    // accepts an object with a key of item, which is set by default
+    // function is called iteratively for each item in the array passed
+    // in to the data prop of FlatList.
+    return <View><Text>{ item }</Text></View>
+  }
+
+  keyExtractor(item, index) { // similar to map arguments
+    return `${index}` // must return a string here.
+  }
+
+  renderSeparator() {
+    // this takes care of putting the separator only between flatlist items.
+    return <View style={{ height: 1, backgroundColor: '#777' }} />
+  }
+
+  render() {
+    return <FlatList
+      data={ items }
+      renderItem={ this.renderItem }
+      keyExtractor={this.keyExtractor}
+      ItemSeparatorComponent={ this.renderSeparator }
+    />
+  }
+
+/* ... */
+
+// why is FlatList better than map with ScrollView? The renderSeparator seems pretty useful.
+
+// --- Misc other useful things --- //
+
+// Text truncation:
+
+// numberOfLines prop can be passed to Text components, which specifies where the number of lines that will display before the text is truncated with '...'.
+
+// Platform specifit changes:
+
+import { Platform } from 'react-native';
+
+const isIOS = Platform.OS === 'ios';
+const isAndroid = Platform.OS === 'android';
+
+// the Platform object's property OS is a string indicating which platform the app is being used on.
+
+const platformStyles = Platform.select({
+  // returns one of two objects that can be spread into
+  // the styles object that is being used for styling.
+  ios: {
+    backgroundColor: '#fff',
+  },
+  android: {
+    backgroundColor: '#eee',
+  },
+})
+
+const styles = StyleSheet.create({
+  /* cross plaforms styles */
+  ...PlatformStyles
+})
+
+// semver = Semantic Versioning: 1.3.5, where 1 is a major, possibly old code breaking change, 3 is a minor, additive change, 5 is a patch, fixing some bug, probably. Install specific versions: npm install react-navigation@2
+
+// nativebase is a set of UI libraries that can be used like bootstrap is used for the web, but with react native.
+
+
+// --- Production --- //
+
+// app.json has info about the app that you can set when publishing, like the app icon and splash screen. Expo can generate the necessary asset files from a single file. Give Expo a single png and it will deal with making the different versions.
+
+// splash screen: provide a large square than can be cropped for all different screen orientations and sizes.
+
+// install exp command line tool:
+
+$ npm install -g exp
+$ exp build: ios
+$ exp build: android
+
+// To publish to apple app store or google play store, you have to sign your app, meaning you can update it, and can prove that you're the on who made it.
+
+// Ejecting: sometimes you need to write native code or use a library that isn't supported by Expo SDK. In these cases you need to eject. This produces ios and android folders, where native code can be written. Once you've ejected, you can no longer do npm start or yarn start. You can't go back once you eject, and you have to build your app in xcode or android studio.
+
+// to eject: $ npm run eject

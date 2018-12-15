@@ -1,0 +1,102 @@
+------------------ HTML ------------------
+
+web servers look for index.html as a default
+
+Most of the stuff below is exampled in exercise1.html in the Week1 folder.
+
+BODY don't style body, put something in there that wraps everything else, but you can put maybe font styling or other things to inherit, but keep it minimal.
+
+HEADER FOOTER can have more than one <header> or <footer> per page.
+
+ARTICLE is for article of content that can be taken out and reused in other places. Doesn't have to be an actual article. Something that is self contained, could be put somewhere else. They usually have a <header> in them too.
+
+ASIDE not related to the main content of the thing that you're in. <header> <footer> <article> could all be inside an aside.
+
+NAV may be put in header or footer, commonly, but not always.
+
+MAIN is for main content. It would encapsulate all the stuff that's not in the header or footer. It represents main content, but you can have as many as you want... WHAT!
+
+SECTION similar to article, but not necessarily an article. Prob has no header. Controls for a video might be a section, for example. A bit vague, maybe try to classify the thing as something other than section before choosing section.
+
+DIV is the least of the above. Make sure to use anything else other than div. Only use div if you have nothing else to do.
+
+
+HEADINGS is the sectioning element for the thing we want to display. <h1> <h2> etc.
+
+ANCHOR needs a href attribute
+
+BLOCKQUOTE & CITE used for quoting things and citing things. Cite seems to make things italic.
+
+DETAILS & SUMMARY makes a details drop down that displays summary and hides everything else.
+
+IMG needs to have src and alt text. Google 'sublime snippets' to edit the default so that it will include the alt=''.
+|--> Prob don't wanna serve anything more than 100k on a website in terms of image size.
+
+PICTURE keep <img> tag, but wrap in <picture> element. Put <source> element in picture, with attrib srcset='image.url.whatever'
+
+BUTTON is not a link, a link is not a button. You can make them look like each other but don't call one the other. Links always take you somewhere, buttons just do something, never take you somewhere.
+
+BR is only for breaking a line of text, never for styling!
+
+HTML ENTITY is something like &copy; for making an ampersand. https://dev.w3.org/html5/html-author/charref
+
+EM tag used to emphasise (make something italic). Used to use <i>, now just for styling. <i> coopted for use with icons.
+
+STRONG tag used for making something bold. Used to use <b>, now just for styling.
+
+SPAN used for styling text, doesn't do anything on its own.
+
+SUP & SUB elements for superscript and subscript.
+
+TIME used to surround anything that is the date or time.
+
+PRE renders everything inside it as it was entered, even if it is code itself.
+
+CODE is rendered as looking like code.
+
+FIGURE is for diagrams in articles, or videos that are related to text that is there, a nice wrapper for media.
+
+VIDEO needs src, and is not self closing like img is. Add the word 'controls' as an attribute, doesn't need to equal anything (or controls='controls'). The 'type' attribute should be googled before you put any old thing in. Like with 'text/css' in a <link>, it is not usually the same as the file extension.
+
+AUDIO works like video
+
+CANVAS used by JS to make games, 3d stuff, whatever. Nothing goes in it, and then you just manipulate with JS. No need to specify height and width in html for canvas (or anything else, really). Do that kind of thing with css or js. Older browsers won't render this tag, but WILL render the contained text. Good place to put fallback content.
+
+TABLE for data, not for layout. Use subtag called <tr> for table rows, and to make the cells: <th> for table head, and <td> for table data.
+
+
+META
+
+<meta charset='uft-8'>
+<!-- use normal English characters to write the code -->
+
+<meta http-equiv='x-ua-compatible' content='ie=edge'>
+<!-- please use Edge rendering engine if it's available. -->
+
+<meta name='description' content=''>
+<!-- description of the page goes in content. This might come up in searches, or when linking. -->
+
+<meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+<!-- make sure it works on retina displays and zoom on touch-->
+
+order of meta data is not important, but usually put it first in the head
+
+LINK
+
+<link rel='apple-touch-icon' href='icon.png'>
+<!-- place favicon.ico in root directory -->
+
+<link rel='stylesheet' href='css/main.css' type='text/css'>
+<!-- where to find css file -->
+
+<script src=''></script>
+<!-- where to find js file -->
+
+common names to link to: style.css, main.css, app.js
+
+boilerplate: https://github.com/h5bp/html5-boilerplate/blob/master/src/index.html
+
+
+
+
+

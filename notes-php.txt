@@ -1,0 +1,335 @@
+PHP notes
+
+--- LAMP ---
+
+Linux operating system computer
+Apache webserver
+MySQL database
+PHP programming language
+
+Vagrant can be used to create a VM to run linux.
+
+Make all files in public folder
+Turn on machine with 'vagrant up'
+Turn off machine with 'vagrand halt'
+
+Domain names:
+
+edit hosts file
+sudo nano /etc/hosts  // to edit
+
+--- PHP ---
+
+open php with <?php
+close php with ?>
+the ?> is optional if there is nothing else after it in the file.
+
+use // or # to make single line comments in php.
+always use a semicolon at the end of every line.
+
+
+<?php echo ''; ?>
+<p><?php echo ''; ?></p>
+<php echo 'hello'; echo ' world'; ?>
+
+Strings:
+
+single quote vs double quote:
+
+single quotes need escape characters, double quotes do not.
+double quotes can have variables used in them.
+
+use . to concatenate strings
+
+echo 'hello'.' '.'world';
+
+can't start variable with number, or include spaces or hyphens
+use camel case or snake case.
+
+$typeOfFruit = 'apples';
+echo 'I would like some '.$typeOfFruit.' please';
+echo "I would like some .$typeOfFruit please";
+  // no need for concatenation, just put variable name in double quotes
+
+php is weakly typed, so it tries type coercion. It is not as weird as JS when it comes to coercion.
+
+number_format({number to format}, {number of decimals}, {decimal separator}, {thousands separator});
+// formats number into a nice string;
+
+use php.net to find out about other built in functions.
+
+Errors:
+
+errors happen on the server, so they may not even reach the user.
+if the error is not sent to the browser, got to server error log.
+
+in vagrant:
+
+$ vagrant ssh
+$ sudo su -
+$ tail /var/log/apache2/error.log
+$ exit // get out of superuser
+$ exit // get out of vagrant user
+
+this file shows:
+  time to the microsecond of the error,
+  the ip address of computer requesting script,
+  the message,
+  the file/line
+
+turn error reporting off:
+error_reporting(0); // place this at the top of the script. Go to php.net to find out more about arguments.
+turn back on:
+error_reporting(-1); // shows all messages. Other arguments available.
+
+
+Conditionals/Logic:
+
+if (true) {
+  // do this
+} elseif {
+  // do something else
+} else {
+  // do the last thing
+}
+
+just like JS, except elseif is ONE word.
+
+can also write like this:
+
+if (true) :
+  // do this
+else :
+  // do this
+endif;
+
+Logical operators:
+
+and == &&
+or == ||
+
+can use words 'and' and 'or' instead of pipes and ampersands
+
+Yoda conditionals:
+
+if (1 === $someVarContainingNumber) {
+  // do something
+}
+
+put value before variable. Why? It reduces mistakes: using single equals instead of double or triple equals
+
+if ($number = 1) {
+  // do something
+}
+
+this just assigns the number to something new, evaluates to true, and continues.
+
+if (1 = $number) {
+  // do something
+}
+
+this will throw a syntax error, highlighting the fact that only one = has been used.
+
+Arrays:
+
+similar to JS in simple form;
+
+set keys:
+
+$fruit = [
+  'green' => 'apple',
+  'yellow' => 'banana',
+  'red' => 'raspberry'
+];
+
+$myarr['blue'] = 'blueberry';
+
+foreach($fruit AS $colour => $typeOfFruit) { // use key and value
+  echo $typeOfFruit.'s are '.$colour.'<br />';
+}
+
+foreach($fruit as $typeOfFruit) { // or just values.
+  echo $typeOfFruit // just echoes the values.
+}
+
+watch out for key collision in associative arrays, putting more than one entry with the same key will overwrite the previous.
+
+use nested arrays to prevent collisions. Give one key an array of multiple values.
+
+For loops:
+
+for ($i = 0; $i <= 10; $i++) {
+  echo $i.'<br />';
+}
+
+While loops:
+
+similar to for loops
+
+can also write like this:
+
+while (true) :
+  // do this
+endwhile;
+
+Switch/case:
+
+$day = 5;
+
+switch ($day) {
+  case 6:
+    // something
+    break;
+  case 7:
+    // something
+    break;
+  default:
+    // other
+}
+
+Functions:
+
+define a function with the function key word
+
+function format_email($name, $email) {
+	$formatted = $name.' <' . $email . '>';
+	return $formatted;
+}
+
+regexr.com is a good place to practice regex
+
+--- Forms ---
+
+action attribute in form is used to set destination of form data.
+
+GET - fetch data
+POST - here, have this data
+
+method attribute in form is used to have GET or POST methods specified.
+
+POST:
+
+echo $_POST['email'] // echoes the value of the form field with name 'email'.
+Should be used if collecting any sensitive data.
+Also relevant if result page doesn't need to be bookmarkable or shareable.
+
+GET:
+
+form data instead of being sent invisibly, is put into URL.
+Should be used for results pages, can be bookmarkable/shareable, filtered content.
+Data for that page needs to be available the next time the data is loaded.
+
+Single vs Multipage form handling:
+
+Multipage takes data from an html form, sends to php page, which forwards on to success html.
+Single has one php script page that handles all eventualities by linking to itself.
+
+--- DATABASES ---
+
+database: like a spreadsheet document
+table: like a tab or sheet of the document
+columns: different data fields, e.g. name, age, price
+row: different entries, e.g. people, purchases, products
+
+access database in scotchbox:
+
+$ vagrand ssh
+$ mysql -u root -p
+    password is 'root'
+
+SHOW DATABASES;
+USE `scotchbox`; // note the backticks - this allows table names to use sql keywords and have spaces in the names.
+SHOW TABLES;
+
+CREATE TABLE `test` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fullname` varchar(255) NOT NULL,
+  `location` varchar(255) NOT NULL,
+  `age` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+)
+// makes new table called test
+
+INSERT INTO `test` (`fullname`, `location`, `age`) VALUES
+  ('Jack Standbridge', 'Sneyd Park', 30),
+  ... etc.
+  ('Katie Standbridge', 'Sneyd Park', 30);
+
+SELECT * FROM `test`;
+SELECT * FROM `test` WHERE `age` < 30;
+
+// don't need to use == or === in SQL
+
+exit // to quit mysql
+exit // to quit vagrant machine and get back to command line.
+
+DESCRIBE `table`; // describes table
+
+SELECT SUM(`age`) AS 'total age' FROM `test` WHERE `location` LIKE '%t%';
+
+// get total ages under alias 'total age' for all entries where the location contains a letter 't'.
+
+"UPDATE `users` SET `activation state` = 'active' WHERE `activation code` = 'jsfpu98r902qshas92i398ha'";
+
+Interacting with Databases with PHP:
+
+
+// example:
+$db_server = "localhost";
+$db_username = "root";    // not going to happen in a production environment
+$db_password = "root";    // not going to happen in a production environment
+$db_database = "scotchbox";
+
+// Create connection
+$db_connection = new mysqli($db_server, $db_username, $db_password, $db_database);
+
+// Check connection
+if ($db_connection->connect_error) {
+    die("Connection failed: " . $db_connection->connect_error);
+}
+
+$query = 'INSERT INTO users (email, password) VALUES ($email, $password)'
+
+$result = mysqli_query($db_connection, $query); // runs query into database set up with database connection that was set up.
+
+
+// need to check the result to see if it ran.
+if ($result){
+  // query ran okay
+  if (mysqli_affected_rows($db_connection) == 1){
+    // and we changed 1 or more rows of data
+  }else{
+    // Uh oh, something went wrong
+  }
+}else{
+  // Uh oh, query didn't run! A problem with the query
+}
+
+
+Sanitising input:
+
+use mysqli_real_escape_string to sanitise user input.
+
+$clean_email = mysqli_real_escape_string($db_connection, $email);
+
+$clean_password = mysqli_real_escape_string($db_connection, $password);
+
+$clean_activation_code = mysqli_real_escape_string($db_connection, $activation_code);
+
+Hashing passwords:
+
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+To pull data from DB into PHP:
+
+$query = "SELECT `fieldname` FROM `tablename` WHERE `stored data` = 'search term';";
+
+$result = mysqli_query($dbConnection, $query);
+// OR
+$result = $dbConnection->query($query);
+
+$data = mysqli_fetch_assoc($result); // output is an array
+// OR
+$data = $result->fetch_assoc(); // output is an array.
+
+TablePlus - software to show gui for sql tables.

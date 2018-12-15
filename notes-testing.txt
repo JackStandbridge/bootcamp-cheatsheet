@@ -1,0 +1,66 @@
+------------------ TESTING ------------------
+
+tools to look at your site on different browsers, devices:
+
+www.browserstack.com
+www.crossbroswertesting.com
+www.broswerling.com
+
+make things look right in the Chrome devtools devices thing, then go on to use proper testing tools.
+
+android Chrome is not quite the same as desktop Chrome.
+
+Chrome on iphone uses safari's rendering engine.
+
+look at compatibility charts to find out how things go - caniuse.com, mdn compatibility etc.
+
+click on 'showall' in caniuse.com.
+
+prefix things with '-webkit-', e.g.:
+
+  display: -webkit-flex;
+  display: -mox-flex;
+  display: -o-flex;
+  display: -ms-flex;
+
+things are constantly changing, use things like mdn docs to find out.
+
+some browsers are insecure and you shouldn't be building for them at all.
+
+Polyfill - usually some js that emulates css properties. Usually best to avoid. Just make a version that works without it.
+
+@supports - tests whether a css property is supported:
+
+  @supports (not grid) {
+    prop: value;  <-- this is only read by browsers that don't support grid.
+  }
+
+modernizr.com - detect browser and feed right css by adding classes/polyfills.
+
+
+------------------ VALIDATION ------------------
+
+HTML validator.w3.org
+CSS jigsaw.w3.org/css-validator
+
+may often validate as part of tooling, but it's a good exercise to use these tools from time to time too.
+
+wave.webaim.org - accessibility checker.
+
+audit your webpage in dev tools in Chrome
+
+------------------ PERFORMANCE ------------------
+
+users don't like waiting more than 2 seconds.
+
+users have data plans.
+
+more users = more money.
+
+write DRY code
+
+asset management: compress images / lazy loading (only load what you need).
+
+first paint (only loads what is visible first)
+
+remember to test in real life! Try it out on your phone. Some companies have device labs.

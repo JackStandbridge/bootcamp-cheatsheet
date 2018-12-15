@@ -1,0 +1,55 @@
+direct child:
+parent > child {}
+
+sibling:
+a ~ img {}
+
+adjacent sibling:
+a + img {}
+
+attribute
+input[type='submit']
+
+any part
+a[href*='http']
+
+starts with
+a[href^='http']
+
+ends with
+a[href$='pdf']
+
+a:link
+a:visited
+a:hover
+a:focus
+a:active
+
+input:enabled
+input:disabled
+input:checked
+input:indeterminate
+
+el:first-child {}
+el:last-child {}
+el:only-child {}
+
+el:first-of-type {}
+el:last-of-type {}
+el:only-of-type {}
+
+el:nth-child(2) {}
+el:nth-last-child(2n) {}
+
+el:nth-of-type(2n) {}
+el:nth-last-of-type(3) {}
+
+child selectors just get the nth thing of the parent
+of-type selectors get the nth of only that type, even if preceded by other different type elements
+
+div::before
+section::after
+
+p::first-letter
+p::first-line
+p::selection - when the user selects text

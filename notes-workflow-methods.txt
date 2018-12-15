@@ -1,0 +1,132 @@
+----- Waterfall -----
+One thing after another
+
+* Get brief
+* Sitemap / information architecture
+* Review and sign off with client
+* Wireframing / prototyping
+* Technical Specification
+* Review and sign off
+* Design
+* Review and sign off
+* Build
+* Review and sign off
+* Profit
+
+- nothing built is seen by client until build stage
+- client may be unhappy with product after seeing it for first time after months
+- everything can get pushed back by previous stages, and suddenly build has to be done in 2 days
+
+----- Agile -----
+Small parts of functionality made at a time
+
+* Designer designs one element
+* Sent to wireframing
+* Built
+* Review and sign off
+* Repeat until complete
+
+- sometimes features can get too long and take up too much of the budget
+- sprint is when you have ~2 weeks to complete one thing
+- still have dependencies
+- plan may change as it goes on
+
+
+----- Lean -----
+Based on the back of Agile, work on everything at the same time, but stripe everything away. Try to push out something in time given, with tiniest team.
+
+- used for proof of concepts and minimal products.
+- just build
+
+----- Kanban -----
+Put all tasks to do in one column
+In action in the next
+QA / testing in the next
+Done in the next
+
+----- Scrum -----
+Managing team.
+Every day / whenever, have a stand up, catch up.
+What did they do yesterday, problems, what are you doing today? etc.
+10 min meetings.
+
+
+----- Fill out details -----
+Who are the users?
+What are they trying to do?
+What are their business aims?
+What technologies are we gonig to use? Do they need to be able to support it in-house?
+What other systems does it need to work with?
+
+----- Personas and user journeys -----
+We have to make assumtions, but we need to test them. Put product in front of someone and see how they use it.
+You are not your user.
+They will use it differently, and for different purposes.
+
+Try to understand the user. what they want to do etc.
+
+
+Example study:
+
+http://apprenticeshiphubwest.co.uk/
+
+-- What is site for?
+
+People interested in becoming appretices, having apprentices or helping young people to become apprentices
+
+-- Who are users?
+
+Employers interested in having apprentices, young adults, parents
+
+-- What will they do?
+
+Find the section relevant to them and navigate to it. Use the website as guidance. Follow links to external resources after reading through the information on the site. They may click on and read articles from the front page or they may navigate immediately to the section that is pertinent for them.
+
+-- What technology will they use?
+
+Anything from smartphones and up-to-date browsers (young people) to out-dated machines (schools and parents).
+
+
+----- sitemap -----
+
+quirktools.com/smaps/
+bubbl.us
+
+----- Scamping and Wireframing -----
+
+Wireframes:
+Start to think about:
+
+content hierarchy
+layout and ui
+responsive behaviour
+user stories
+
+when sending a wireframe to a client, explain what the wireframe is for ON the wireframe
+'it's just a template'
+wireframing doesn't provide any interactivity
+might be good to send prototypes too! Client can see colours, interact, visualise.
+
+Scamps:
+Comes before wireframe
+Just a sketch of a page
+
+what is the difference between an api framework and a library?
+
+A library is a repository of already written code, tends to have narrow scope.
+A framework is a broad set of methods/functions that are usually interdependent, which the user completes to make a program.
+An API is a way that programs can communicate with each other in a predefined way.
+
+
+----- Style Guide -----
+A general collection of rules that guide how to design, write, code etc. a site.
+
+bristol.gov.uk :-
+- card with title and subheadings on main page
+- green button on page following card headings / sections under jumbotron on each tab
+- sidebar in articles that shows the article context in the whole topic
+
+fractal.build is a tool for making style guides
+
+styleguides.io has a list of style guides and pattern libraries.
+

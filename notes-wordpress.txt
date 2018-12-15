@@ -1,0 +1,432 @@
+Wordpress requires LAMP stack. Use vagrant.
+
+Other options - MAMP, WAMP, XAMP, Flywheel Local - instead of vagrant.
+
+To setup wordpress:
+
+- download scotchbox: https://github.com/develop-me/scotch-box/archive/master.zip
+- unzip into project folder
+- vagrant up
+- download wp files: wordpress.org
+- unzip and put files in public folder of vagrant (overwrite index.php)
+- vagrant ssh, mysql -u root -p, CREATE DATABASE `examplename`;
+- dbName: examplename, dbUser: root, dbPassword: root, dbHost: localhost.
+- visit http://192.168.33.10 or whatever ip address you changed it to
+- click let's go, enter db info
+- set up site
+
+if you edit vagrant file after doing vagrant up, the ip address or hostname won't change. Make sure to then do 'vagrant reload --provision' to reset these details. Or use 'vagrant halt' -> 'vagrant destroy' -> 'vagrant up'
+
+vagrant global-status --prune - gets rid of deleted vagrant boxes so that vagrant forgets them
+
+vagrant plugin install vagrant-vbguest - if all files appear to be in the right place, but at the ip address nothing is displayed, this command may help.
+
+cPanel - control panel provided by hosting company. There may be an app installer and have wordpress installed for you.
+
+go to /wp-login.php to go to login page.
+
+CONTENT TYPES:
+
+Posts, Comments, Users, Media
+
+Post:
+Most content will be in the Post family. It relates to both pages and posts (lowercase p).
+
+Can make custom types. - Custom Post Types - CPT
+
+posts (lowercase):
+
+categories and tags
+change format
+can be displayed in archives
+archive is a special type of wordpress template that can display multiple posts - shows post summaries, instead of entire posts.
+
+pages (lowercase):
+no tags or categories
+no post format
+can set another page to be the parent
+
+slug - last slash section of url
+
+Media:
+
+Wordpress makes 'thumbnails' of images you give it, which are not necessarily small, but just different size versions of the image. It uses html srcset to serve different sized images.
+
+THEMES:
+
+Use 2015, 2016, 2017 to test plugins. These default themes are very stable. If the plugin doesn't work on these themes, the problem is with the plugin, but if it does, the problem may be with whatever other theme you're using.
+
+GUTENBERG:
+
+version 5 of wordpress, will overhaul wordpress.
+editing interface will change.
+
+PLUGINS:
+
+can be backend or frontend functionality.
+plugins should be theme agnostic
+test plugins in a sandbox, because they will gum up the database, even if you delete them.
+similar plugins may interfere with each other.
+
+DEBUGGING:
+
+deactivate all plugins
+activate stable theme
+activate a plugin / batch of plugins at a time
+test
+
+Shortcode:
+
+easy to recognise code in square brackets.
+put it in a WYSIWYG box and it acts like a function call.
+
+
+Process:
+
+Plan - purpose, audience
+UX design - organise and present info
+Copy - text
+Design - detailed layout, pictures, colours
+Build - skills from this course
+Test - get customers or friends to help
+Make changes - inevitable
+Go live - publish site
+Market and promote - hard work
+
+
+ALTERING THEMES:
+
+PHP and HTML are the heart of themes
+CSS, JS and icons are add on
+
+Never write SQL in wordpress. Always rely on the built in wp functions.
+When making a new theme, don't start from scratch - find a starter theme to edit.
+
+The style.css file contains the information that informs wp about the name of the theme etc.
+
+get_template_part('template-parts/content'); // function looks in top level template directory don't include file extension. This is like using require 'example'; but this is the wordpress way.
+
+get_template_part('template-parts/content', 'page'); // looks for a file called content-page.php in the /template-parts folder.
+
+get_template_part('template-parts/content', get_post_format()); // second parameter could be another function, a variable etc.
+
+more in built functions:
+
+get_header();                 -> header.php
+comments_template();          -> comments.php
+get_footer();                 -> footer.php
+get_template_part('content'); -> content.php
+
+get_header('home')            -> header-home.php
+
+To find post or page id, hover over its name in the posts or pages section and look at the hover link in the bottom of the browser.
+
+What the file - plugin that shows what file and template parts are being used on each page.
+
+Customizing existing themes:
+
+Child Themes - technique for customizing an existing theme in a safe, future-proof manner.
+
+If you edit the raw theme, when the theme is updated, your changes disappear, so you need to make a child theme.
+
+Child theme should have as few files as possible. It only has the differences that are used to overwrite the parent theme. WP looks in child theme first for files, then if it can't find them, it looks in the parent theme. Don't just copy the entire parent theme into the child theme.
+
+Hierarchy: WP first looks for filename in child theme, then parent theme, then if it can't find it, it moves to the next filename in the hierarchy and looks in the child theme first, then parent theme, etc.
+
+To make child theme:
+
+Make child theme directory in the same directory as the parent them directory.
+The name of the child theme doesn't really matter, but it's best to do 'parentname-child'.
+Child theme doesn't need index.php, wherease parent theme does.
+Child theme needs a functions.php file, whereas parent doesn't.
+Both child and parent need a style.css.
+
+WP knows that it is a child theme of another theme by the comment block in the style.css of the child theme.
+
+e.g.:
+
+/*
+** Template: ParentThemeName
+*/
+
+The parent theme name needs to be the folder name of the parent theme, not the name it has in its own comment block in style.css.
+
+functions.php contains a few lines of code telling wp which stylesheets to load:
+
+<?php
+add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles');
+
+function theme_enqueue_styles() {
+  wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
+}
+
+WORDPRESS AND GIT:
+
+Don't include wp corefiles in git, which are the ones all copied into the public folder in vagrant, and are the things that come in the zipfile that you download when you download wp.
+
+Don't put db in git.
+
+Don't put plugins or parent themes in git.
+
+Only git things that you're working on - child themes or starter themes.
+
+Don't put the entire theme folder in git.
+
+When copying files from the parent theme to the child theme, it is important to maintain file structure. Child themes should be slim, so only copy across files that are needed.
+
+
+--- THE LOOP ---
+
+code that is used to display Posts (capital P) - pages, posts, custom post types
+
+E.g.:
+
+<?php
+
+while ( have_posts() ) :
+
+  the_post();
+
+  get_template_part( 'template-parts/content', get_post_format() );
+
+endwhile;
+
+?>
+
+over 100 functions cannot be used outside the loop (called tags):
+
+the_title();
+the_content();
+the_category();
+
+they need an object called 'the_post()' set up in the loop in order to work.
+
+Making a loop:
+
+$query_args = array(
+  'category_name' => 'employer-voice',
+  'post_type' => 'post',
+  'posts_per_page' => 10,
+  'orderby' => 'rand'
+);
+
+$result = new WP_Query( $query_args );
+
+while ( $result->have_posts() ) : $result->the_post(); ?>
+  <h1><?php the_title(); ?></h1>
+
+  <div class="entry-content">
+    <?php the_content(); ?>
+  </div>
+<?php endwhile;
+wp_reset_query();
+
+
+another example:
+
+<?php
+
+  $query_args = array(
+      'post_type' => 'talk',
+      'meta_key'  => 'date',
+      'orderby'   => 'meta_value_num',
+      'order'     => 'ASC'
+  );
+
+  $the_query = new WP_Query( $query_args );
+
+  // The Loop
+  if ( $the_query->have_posts() ) { ?>
+      <section class="talks-teasers">
+
+          <h2>Listen to a talk</h2>
+          <p>My next talks will be:</p>
+
+          <?php
+          while( $the_query->have_posts() ) : $the_query->the_post(); ?>
+
+              <?php get_template_part( 'partials/teasers/talks-future' ); ?>
+
+          <?php endwhile; // End the loop ?>
+
+      </section>
+
+  <?php
+    wp_reset_query();
+    } else {
+        //get_template_part( 'template-parts/content', 'none' );
+    }
+  ?>
+
+Hooks: actions and filters:
+
+Hooks are places in the running of wordpress where we can change the behaviour of core files.
+Hook onto the process, make some change, then detatch and it continues.
+They allow us to customise the inner workings of wordpress.
+
+Action hooks:
+
+action hooks allow us to run code at a predefined place in wp. e.g. send email when admin publishes a post / add image before footer is rendered.
+
+adding a new piece of code in a certain place.
+
+functions.php is where you put action hooks.
+- write a function that performs the action.
+
+function examplefunction() {
+  // do something
+}
+
+- write the part that tells the function when to run.
+
+add_action('wp_footer', 'examplefunction');
+
+Filter hooks:
+
+filter hooks allow us to filter data through a function and perform an action on it.
+
+e.g. when post title is displayed, add the date to it
+     when author's url is output, redirect to linkedin
+
+function filterExample($title) {
+  return 'Modified '.$title;
+}
+
+add_filter('the_title', 'filterExample');
+
+ACF:
+
+Stands for Advanced Custom Fields
+
+Allows us to add new fields in the backend by adding new fields.
+
+
+CPT:
+
+Stands for Custom Post Types.
+
+make CPTs in functions.php, don't use a plugin to do it or it will store everything in the db, and if you want to migrate, it will mean you need to migrate the db too.
+
+- Define naming or labels (array)
+- Define the options/functionality (array)
+- Create the action hook (functions)
+- Update permalinks
+
+function create_custom_post_type_raspberry() {
+  $labels = [
+    'name' => 'Raspberries',
+    'singular_name' => 'Raspberry',
+    'add_new' => 'Add New',
+    'add_new_item' => 'Add New Raspberry',
+    'edit_item' => 'Add Raspberry',
+    'view_item' => 'View Raspberry',
+    'search_items' => 'Search Raspberry',
+    'not_found' => 'No Raspberries Found',
+    'not_found_in_trash' => 'No Raspberries Found in Trash',
+    'parent_item_colon' => ''
+  ];
+
+  $args = [
+    'label' => __('Raspberries'),
+    'labels' => $labels, // from array above
+    'public' => true,
+    'can_export' => true,
+    'show_ui' => true,
+    '_builtin' => false,
+    'vapability_type' => 'post',
+    'menu_icon' => 'dashicons-calendar', // customise favicon in dashboard
+    'hierarchical' => false,
+    'rewrite' => ['slug' => 'raspberries'], // defines url base: jackbox/raspberries
+    'supports' => ['title', 'thumbnail', 'editor', 'excerpt'],
+    'show_in_nav_menus' => true,
+    'taxonomies' => ['event_category', 'post_tag'] // own categories
+  ];
+
+  register_post_type('raspberries', $args); // used as internal identifier
+}
+
+add_action('init', 'create_custom_post_type_raspberry');
+
+// after making a custom post type, go to Settings -> Permalinks and just save changes without making any changes.
+
+set custom post type to have archive, add 'has_archive' => true to $args.
+
+
+--- DESIGN ---
+
+https://htmlcolorcodes.com/color-picker/
+https://color.adobe.com/explore/
+
+
+--- MAINTAINING SITE ---
+
+Need to update wordpress when updates are available.
+Get rid of out-of-use plugins.
+Keep content up to date, especially dead links.
+
+--- MIGRATION AND GOING LIVE ---
+
+migrate from local to staging for client to look at.
+staging site is at some other url separate from the real site, e.g. client.developersite.co.uk/wp1 or staging.developersite.co.uk/wp1
+migrate from staging to live when it's ready.
+
+Backing up:
+
+Use a tool to backup regularly.
+
+Plugins like BackUp Buddy or tools like WPManage are good for backups.
+
+Remember, git doesn't backup plugin settings or databases or anything.
+
+Don't store backups on the same server as the site, because if the server goes down, there is no backup.
+
+Migration:
+
+ManageWP, BackUp Buddy, Migrate DB - tools
+
+Migrate DB is for migrating just the database.
+
+- copy files and ftp them to the new server. (filezilla, cyberduck)
+- copy database (the content) to new database.
+- update wp-config to point to the new database.
+
+To copy DB:
+
+Export existing content to XML file with Tools > Export then into new site with Tools > Import. (just the actual pages and posts text content only - no plugin data or images or anything, but may have been updated to do everything, need to test).
+
+Export (dump) the database, change the URLs and import it into the new database on the web server. (all self referential URLs are hard coded, and need to be changed to reference the new site address).
+
+- vagrant ssh
+- navigate to /var/www/public/
+- dump the database with: mysqldump -u {USER} -p {DATABASE} > {DESTINATION FILE NAME}
+  e.g. mysqldump -u root -p wordpress > wordpress.sql;
+  this will make the wordpress.sql file on the server (i.e. vagrant)
+
+open sql file in code editor and do find and replace to change URLs.
+change old url: 192.168.33.12
+to new url: www.whatever.com
+
+(OR
+
+    Use this query for EVERY table:
+
+    UPDATE `table name` SET `field name` = REPLACE(`field name`, 'find this string', 'replacement string');
+
+)
+
+Upload the sql file with ftp client ot put in vagrant public folder
+ssh into server with ssh user@host
+navigate to var/www/public
+import the data into the database with: mysql -u {USER} -p {DATABASE} < wordpress.sql;
+
+Update wp-config.php:
+
+Update dbname, dbuser, dbpassword, dbhost. Give them meaningful names. Chances are that dbhost will remain 'localhost'.
+
+--- CONTINUED LEARNING ---
+
+Join meet up groups:
+
+www.meetup.com/pro/wordpress
+
+wpbristol.co.uk

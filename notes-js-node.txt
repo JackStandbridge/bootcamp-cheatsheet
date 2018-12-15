@@ -1,0 +1,101 @@
++'12' + 12; // 24 - use a plus before a string to make it a number
+
+!!(7) // double bang can be used to convert a truthy value into a 'true'
+
+
+let range = (start, end, increment) => {
+  let arr = [];
+  increment = increment ? increment : 1;
+  for (leti = start; i <= end; i += increment) {
+    arr.push(i);
+  }
+  return arr;
+}
+
+// let oneHundredRange = range(1, 100, 13);
+// console.log(oneHundredRange); // [ 1, 14, 27, 40, 53, 66, 79, 92 ]
+
+the braces of an object aren't a new scope.
+
+String methods:
+
+str.charAt(2)
+str.substr(2, 3) // (start, count to return)
+
+Date object:
+
+let now = new Date();
+let birthdate = new Date("1987-12-10T05:10:00");
+
+birthdate.getFullYear(); // 1987
+birthdate.getDate(); // 10
+birthdate.getDay(); // 4 ( 0-6 where 0 is Sun and 6 is Sat)
+birthdate.getMonth(); // 11 (0-11, 0 is Jan, 11 is Dec)
+birthdate.getTime(); // 566111400000 - num of milliseconds since 1st Jan 1970;
+
+now.toLocaleTimeString(); // outputs hours mins and seconds in local time.
+
+can use getHours() and getMinutes() too.
+
+always store a date in UTC. Don't store things with a timezone attached.
+
+It's generally easier to use moment.js
+
+Math object:
+
+Math.PI; // pi
+Math.E; // e
+
+Math.floor(3.14); // 3
+Math.ceil(3.14); // 4
+Math.round(3.14); // 3
+
+Math.sqrt(4); //2
+Math.pow(2, 3); // 8
+
+Math.log(6);
+Math.cos(45);
+
+Math.max(3, 6); // 6
+Math.min(3, 6); // 3
+
+
+------DESTRUCTURING------
+
+let person = {
+  firstName: 'Jack',
+  lastName: 'Standbridge'
+}
+
+let {firstName, lastName} = person;
+console.log(firstName, lastName); // Jack, Standbridge
+
+let fullName = ({ firstName, lastName }) => firstName + ' ' + lastName;
+
+fullName(person); // 'Jack Standbridge'
+
+let keys = Object.keys(person); // ['firstName', 'lastName']
+let values = Object.values(person); // ['Jack', 'Standbridge']
+let entries = Object.entries(person); // [ [ 'firstName', 'Jack' ], [ 'lastName', 'Standbridge' ] ]
+
+
+------CLASSES------
+
+class Person {
+  constructor(name, dob) {
+    this.name = name;
+    this.dob = dob;
+  }
+
+  getAge() {
+    let now = new Date();
+    let millisecondsPerYear = 31556952000;
+    let years = (now - this.dob) / millisecondsPerYear;
+
+    return Math.floor(years);
+  }
+}
+let jack = new Person('Jack', new Date('1987-12-10T05:10:00'));
+console.log(jack.getAge()); // 30
+
+setter methods often return this after the function. It allows us to chain together methods. i.e. book.setPrice(99).getPrice(); // sets the price, then outputs it immediately.

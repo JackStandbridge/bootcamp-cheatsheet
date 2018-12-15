@@ -1,0 +1,268 @@
+---- JS IN THE BROWSER ----
+
+put script files at the end of <body>
+
+you can't use src attribute and inline JS in the same script tag.
+
+it is often preferred to use a CDN for delivering js libraries. They are closer and chances are it may already exist in the browser's cache because other sites linked to the same CDN.
+
+avoid global scope! Browsers have their own global variables e.g. 'top';
+
+let top = 100; // this won't work!
+console.log(top) // browser has already defined top
+
+wrapping things in functions then running them is an inelegant way, but functional way to sidestep the problem. The function name could still clash with global variables.
+
+A better solution is to make a function and call it immediately without declaring a variable. e.g.:
+
+(() => {
+  // contents of program;
+  // all programs will be local
+})();
+
+Immediately Invoked Function Expression -> IIFE
+
+Using an IIFE is more robust than just using {} because var can escape code blocks.
+
+Tooling will often put an IIFE around files for us, or we use an ES6 module.
+
+
+---- DOM ----
+
+all browsers have a global element called document, which is the entire html page.
+
+document.documentElement points to the whole page
+document.head points to the head
+document.body points to the body
+
+document methods:
+
+document.getElementById('example'); // returns an HTML element class object
+// this is by far and away the most efficient way to select an element.
+// the dom is often a bottleneck for performance
+// selecting by ID is the fastest method for fetching an element.
+// if nothing is returned, the result will be 'null'.
+
+document.querySelector('.card');
+// returns the same type of object as getElement(s)By(Id/ClassName/TagName)
+
+passing 'document' as 'd' into an IIFE can save some typing if the IIFE contains your whole script.
+
+classList methods:
+
+x.classList.add('example');
+x.classList.remove('example');
+x.classList.toggle('example');
+// toggle returns true for if it has added, false for if it has removed.
+
+changing styles by adding and removing classes is very common.
+
+you can call .querySelector() on the result of something returned by .querySelector() or .getElement...(). Anything that returns an html element can have these functions called on it, but it's better to search specifically.
+
+often need to check if document.querySelector() returns a valid element or null.
+
+---- HTML COLLECTIONS & NODE LISTS----
+
+These methods return an HTML Collection:
+document.getElementsByClassName('');
+document.getElementsByTagName('');
+
+This method returns a NodeList:
+documents.querySelectorAll('');
+
+querySelectorAll and getElementById are the most commonly used DOM API methods.
+
+What is the difference between an HTML collection and a NodeList?
+-- Both array-like objects. We generally turn them into an array. Pass result into Array.from()
+
+doc.querySelectorAll('[active]') searches for elements with 'active' attributes.
+
+
+---- ID OR CLASS ? ----
+
+in CSS, never use ID, but in JS, it's much more efficient to select elements with ID than with a class.
+
+It's a good idea to use a class of js__example for any classes you use with JS. Separate styling classes and programming classes. You can add js__ to IDs but IDs are not used for styling, so there isn't as much point.
+
+
+---- TRAVERSING THE DOM ----
+
+.firstElementChild
+.parentElement
+.nextElementSibling
+.previousElementSibling
+.children
+
+// all selectors to help traverse the DOM. Use these things instead of more query selectors.
+
+it can be much more efficient to select a container element, then use these methods to select children. Again, it's faster to use .getElement...() rather than .querySelector();
+
+
+---- Other ----
+.textContent vs .innerText vs .innerHTML
+
+.innerHTML will return a string containing text and all subtags and subtext in an element
+
+.innerText will return just the text, no tags, but will respect display properties i.e. if a sub element span has display: none; then it won't return it. As such, it is slow.
+
+.textContent is the same as innerText, but doesn't respect display, and so is very fast, but not supported by older browsers.
+
+let container  = document.getElementById('container');
+
+conatiner.clientHeight       // returns height of fetched element
+conatiner.clientWidth        // returns width of fetched element
+conatiner.style.borderColor  // includes inline style
+window.getComputedStyle(container).borderColor; // gets the CSS - very expensive operation
+container.innerHTML;         // retrieve text base representation of html in element. e.g. ('<p>Text</p>')
+container.textContent;       // just gets the text in the element
+container.getBoundingClientRect(); // gets position of element relative to the page.
+
+let height = container.clientHeight;
+container.style.height = (height + 300) + 'px'; // add 300 px to height of container
+
+window.pageYOffset; // current vertical scroll position
+window.pageXOffset; // current horiz scroll pos
+
+window.innerHeight; // height of viewport
+window.innerWidth;  // width of viewport
+
+document.body.clientHeight; // height of document
+document.body.clientWidth;  // width of the document
+
+window object is part of the BOM (Browser Object Model) (global scope);
+
+container.style.border = '1px solid red';
+container.style.marginTop
+container.style.position
+container.style.left
+container.style.top
+container.style.height
+container.style.width
+
+container.textContent = 'some new text'; // careful, this will overwrite EVERYTHING inlucing all html in the element.
+
+let input = document.getElementById('age');
+
+input.getAttribute('name')  // returns name of input
+input.getAttribute('value', '600') // set default attrib to 600
+input.removeAttribut('value') // removes value
+
+input.value // gives you actual current value of input, returns a string
+
+input.focus(); // gives input focus.
+
+
+--- DATA ATTRIBUTES ---
+
+use example.dataset.id to fetch the data-id='something' from the html.
+
+Only use data-* as a last resort. Storing data in the DOM is a bad idea.
+
+
+--- CREATING ELEMENTS ---
+
+let p = document.createElement('p'); // string represents tag we want to create
+p.textContent = 'A paragraph'; // treat the created element as an HTML element
+
+let container = document.getElementById('container');
+container.appendChild(p); // add a child to an element after existing children.
+
+container.insertBefore(p, container.firstElementChild) // inserts first argument before second argument. If the first element already exists on the page, it will take it and move it to the destination specified in the second argument
+
+target.insertAdjacentElement(exampleposition, element)
+
+positions for insertAdjacentElement:
+beforebegin
+afterbegin
+beforeend
+afterend
+
+// use these as positions with insertAdjacentElement
+
+.remove(); // removes an element, but can still exist as a JS variable.
+
+don't use .innerHTML to add elements! - it is not secure.
+
+let fragment = document.createDocumentFragment(); // makes something that can be edited without touching the actual DOM multiple times
+
+when you call something like list.appendChild(fragment), the fragment disappears and the contents are appended.
+js only takes the contents from the fragment and discards the fragment itself.
+
+Again, only touch the DOM as infrequently as possible.
+
+jQuery - only use if you're using it a lot. If it's already used on a project, there's no reason not to use it.
+
+--- DEBUGGING ---
+
+writing 'debugger;' in code asks Chrome to stop execution. Be careful with this, because it will pause the execution for everyone who is using the code and has dev tools open.
+
+--- EVENTS ---
+
+.addEventListener('mousemove', () => console.log('mouse moving over element'));
+don't have expensive event handlers on common events, i.e. mousemove events
+
+keydown
+keyup
+click
+mousedown     // mouse button pressed
+mouseup       // mouse button let up
+focus/blur    // form field gains or loses focus
+change/input  // triggers on input or change in form field, input updates with EVERY input, but change happens on completion
+submit        // when form is submitted
+
+events can be added to individual elements or to other things like the window.
+
+window.addEventListener('scroll', () ...)
+window.addEventListener('resize', () ...)
+
+--- EVENTS ---
+
+input.addEventListener('keyup', event => {
+  if (event.key === 'Escape') {
+    input.value = '';
+  }
+})
+
+useful event properties:
+
+event.key     // keyboard key
+event.clientX // mouse coord
+event.clientY // mouse coord
+event.type    // event type e.g. mousedown
+
+event objects differ based on events
+
+event.preventDefault(); // useful for disabling default behaviour of link, for example, or a form submit button to save from losing info.
+
+Bubbling:
+
+parent elements are notified of child events and event happens on every parent too.
+
+event.target lets you know where the event originated.
+
+const card = document.getElementById('card');
+card.addEventListener('click', event => {
+  console.log(event.target);
+  if (event.target.classList.contains('fa-instagram') {
+    event.preventDefault();
+  })
+})
+
+// this whole block prevents the instagram link in the example profile card from leading you to the link destination.
+
+// this is delegating the event to something higher in the hierarchy, but performing actions based on the children.
+
+// Inner elements happen first. You can stop the bubbling, too, to stop parent elements' event listeners from triggering:
+
+event.stopPropagation();  // prevents bubbling.
+
+// use delegation to set up an eventListener on a parent and then check the event.target info, e.g. event.target.tagName === 'A'
+// tagName is always returned as capitals.
+
+.matches() // use CSS style selectors to select elements.
+
+if (event.target.matches('li.list-item.current a')) {  // checks if it's an anchor in an li with classes of 'list-item' and 'current'.
+  event.preventDefault();
+  event.target.classList.add('clicked');
+}
+

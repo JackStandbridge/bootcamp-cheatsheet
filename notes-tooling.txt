@@ -1,0 +1,236 @@
+--- GIT ---
+
+version management, takes snapshots of project over time, can be reverted at any time
+automatically keeps track of which files have changed.
+changes have an audit log
+
+most widely used source code management tool
+third of developers use it
+excellent tooling support
+
+Philosopy:
+Storing changes - snapshots, not differences
+
+Behaviour:
+most operations are local - reduces network load, increases speed, allows offline working.
+integrity - everything is check-summed before storage.
+            snapshots are referred to checksum
+            impossible to change anything without git knowing
+            checksum is unique and will change based on any changes
+
+checksum can be a useful way to indicate to other developers which version you're on.
+
+Git only adds data
+hard to get it to do things that are not undoable
+only way to lose data is if you don't push - as soon as it's on repository, it's saved
+great safety net for trying things out and rolling back.
+
+Git makes a hidden .git folder where everything is stored - don't really need to worry about what happens in this folder
+
+Git is good for managing small files - not very good for video files or anything.
+
+--- THE BASICS ---
+
+language:
+
+repository / repo
+bundle of project files and versioning database, main or local
+
+fetch
+makes sure you have up to date info for the current project.
+
+checkout
+switch your project directory to match what they look like in a certain version
+
+commit
+create snapshot of the project files in current state
+
+push
+push your snapshots (work), to the central project repo
+
+pull
+pull work form central repo. Basically does a fetch and a checkout
+
+
+Workflow:
+1. make changes
+2. commit work
+3. push work
+4. pull other people's work in case other people have made changes.
+
+New project process
+1 set up project on github
+2 set up project folder locally
+3 start version management folder
+4 add remote repo
+5 undertake workflow
+
+always use Clone with SSH when linking github to local project folder.
+
+git init
+git remote add origin
+git add {file name} - adds file to staging area for next commit.
+git add * - add all changed files.
+git fetch
+git checkout master
+git commit -m 'message'
+git commit -am 'message' - adds all of changed files, but you can't choose which ones.
+git push
+git status - see what's going on
+git rev-parse HEAD - gives checksum of version
+git reflog - shows a reference log
+git clone {repository url} {folder name}
+
+Conflicts:
+get push rejection
+do git pull before git push
+resolve conflicts, then push again.
+
+git diff gives an insight into differences between current local files and last snapshot locally.
+
+
+
+--- BEST PRACTICES ---
+
+keep up to date by pulling frequently
+don't commit credentials/configs - security and environment-dependant
+write good descriptive message
+use 'git rm {file}' and 'git mv {file} {directory}' to remove or move files instead of using finder.
+git will think that files are deleted if you don't tell git to do it itself.
+
+
+git rm {file} - delete file from computer and project
+git rm --cached {file} - remove file from tracking, but retain file
+Add to .gitignore files - ensure file is not added back into tracking in the future.
+
+edit .gitignore to included file names like:
+TODO.md
+*.php
+super-secret-passwords.txt
+
+if adding to .gitignore once something is already tracked requires you to also run 'git rm --cached {filename.ext}'
+
+--- BRANCHES ---
+
+git branch my-experimental-branch - makes a new branch from current commit
+
+git checkout my-experiemental-branch - start working on branch
+
+git push origin my-experimental-branch - make it available on git hb
+
+git checkout master
+git pull
+git merge my-experimental-branch // can only merge in to where you are
+
+git branch -a // list all branches
+
+git branch -d my-experimental-branch // delete branch
+
+
+Typical work flow:
+
+git checkout master
+git pull
+git branch my-experimental-branch
+git checkout my-experimental-branch
+    // do work
+git commit -am 'commit message'
+git push origin my-experimental-branch
+git checkout master
+git pull
+git merge my-experimental-branch
+git push
+
+git status will tell you which branch you are on
+
+
+Pull request:
+
+Request someone to review code before merging back to master
+
+push branch to github, then create pull request and assign another member of the team to review it.
+
+
+git reset HEAD --hard  // resets working directory to the last commit
+git reset HEAD~ --hard // go back one commit and lose changes done since
+              {2}/{8}  // go back specified number of times
+git reset HEAD~ --soft // undo commit, but keep changes to files
+
+
+
+--- GITFLOW ---
+
+two persistent branches - master and development
+
+tagging:
+
+git tag v1.0
+
+--- GULP ---
+
+toolkit for automation of time consuming tasks
+gulpfile.js // allows you to define and pull in dependencies (plugin)
+            // map plugin to variable
+            // define tasks that can be run, the order, etc.
+
+file must be called gulpfile.js, because that's what Gulp looks for
+
+let gulp = require('gulp');
+gulp.task('minify-css', () => {
+  return gulp.src('css/*.css')
+    .pipe(do something)
+    .pipe(do something else)
+    .pipe(gulp.dest('./css/'));   // saves it back to a destination
+})
+
+Gulp Sass:
+
+gulp.task('sass', function () {
+    var stream = gulp.src('./scss/styles.scss') // looks for scss files
+        .pipe(sass())                           // compiles to css
+        .pipe(gulp.dest('./css/'))              // sets destination
+        .pipe(rename('styles.css'));            // output
+    return stream;
+});
+
+Minification and Combination:
+
+gulp.task('minify-css', () => {
+  return gulp.src('css/styles.css')
+  .pipe(cleanCSS({compatibility: 'ie8'}))
+  .pipe(rename({suffix: '.min'}))
+  .pipe(gulp.dest('./css/'));
+});
+
+
+Sequencing:
+
+gulp.task('styles', function(callback) {
+  gulpSequence('sass', 'minify-css')(callback) // call the previous two functions
+});
+
+gulpwatch allows us to watch files for change then run task
+
+gulp.task('watch', function() {
+  gulp.watch('./scss/*.scss', ['styles'])
+})
+
+when combining scripts, remember that the order of scripts can be relevant.
+
+
+--- NPM ---
+
+npm init // to prompt project creation
+npm install bootstrap // downloads bootstrap and dependencies for bootstrap in cwd
+
+creates package.json which contains info about project.
+
+npm install gulp --save // use --save to make sure it installs it correctly
+
+got to npm site and search for plugins
+
+When using Gulp Npm and Git
+
+don't track: node_modules or package-lock.json // add these paths to your .gitignore file
+do track: package.json, gulpfile.js
+
