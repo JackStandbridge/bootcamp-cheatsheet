@@ -527,3 +527,18 @@ return [
 // plan database structure
 // plan redux actions
 
+// --- Cloning Laravel --- //
+
+// - clone project, cd into directory
+// - make sure composer is installed
+// - $ composer install
+// - $ vendor/bin/homestead make
+// - $ mv env.example .env
+// - $ vagrant up
+// - $ vagrant ssh
+// - $ cd code
+// - $ art key:generate
+// - $ art migrate
+// - $ exit
+// - $ npm install
+// - $ npm run watch
