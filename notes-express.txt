@@ -1,0 +1,46 @@
+// --- Creating An Express App --- //
+
+// have express-generator installed via npm
+
+$ express --vue=pug appname
+
+$ cd appname
+$ npm install
+$ npm start
+
+// app should be running at localhost:3000
+// change port number in /bin/www
+
+const port = normalizePort(process.env.PORT || '9000');
+app.set('port', port);
+
+// go to /routes to create a route:
+
+const express = require('express');
+const router = express.Router();
+
+router.get('/', (request, response, next) => {
+	response.send('data to be sent');
+});
+
+module.exports = router;
+
+// open up /app.js and insert the new route:
+
+const myRoute = require('./routes/myRoute');
+
+/* ... */
+
+app.use('/myRoute', myRoute);
+
+// set up cors:
+
+$ npm install cors
+
+// in /app.js:
+
+const cors = require('cors');
+
+// after app.set calls:
+
+app.use(cors());

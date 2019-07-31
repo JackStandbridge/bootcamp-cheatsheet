@@ -1,0 +1,214 @@
+$ git clone https://github.com/docker/doodle.git
+$ cd doodle/cheers2019 && docker build -t jackstandbridge/cheers2019 .
+$ docker run -it --rm jackstandbridge/cheers2019
+$ docker login && docker push jackstandbridge/cheers2019
+$ docker pull jackstandbridge/cheers2019
+
+## List Docker CLI commands
+$ docker
+$ docker container --help
+
+## Display Docker version and info
+$ docker --version
+$ docker version
+$ docker info
+
+## Execute Docker image
+$ docker run hello-world
+
+## List Docker images
+$ docker image ls
+
+## List Docker containers (running, all, all in quiet mode)
+$ docker container ls
+$ docker container ls --all
+$ docker container ls -aq
+
+
+## Example setup:
+
+# in Dockerfile:
+
+# Use an official Python runtime as a parent image
+FROM python:2.7-slim
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Define environment variable
+ENV NAME World
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]
+
+
+# in requirements.txt:
+
+Flask
+Redis
+
+# in app.py:
+
+from flask import Flask
+from redis import Redis, RedisError
+import os
+import socket
+
+# Connect to Redis
+redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    try:
+        visits = redis.incr("counter")
+    except RedisError:
+        visits = "<i>cannot connect to Redis, counter disabled</i>"
+
+    html = "<h3>Hello {name}!</h3>" \
+           "<b>Hostname:</b> {hostname}<br/>" \
+           "<b>Visits:</b> {visits}"
+    return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname(), visits=visits)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=80)
+
+## build a docker image:
+$ docker build --tag=<thisIsTheImageName> .
+# or
+$ docker build -t <thisIsTheImageName> .
+
+## run the app by remapping the app's port 80 to something else:
+docker run -p 4000:80 <thisIsTheImageName>
+## here, 80 is equivalent to EXPOSE 80 in the Dockerfile, and 4000 is where we can access the exposed port
+
+# to run in the background, add -d flag for 'detached':
+$ docker run -d -p 4000:80 testimage
+
+# this gives you the long container ID, which matches to the first 12 characters of the IDs when you run `docker container ls`, which is also what you get when you fetch the hostname from inside the container.
+
+# to stop the container:
+
+$ docker stop <ID>
+
+## Sharing an image
+
+# A registry is a collection of repositories, and a repository is a collection of images, sort of like a github repo, but the code is already built
+
+$ docker login
+
+# Tag the image: the notation is username/repository:tag where tag is optional but recommended. It relates to the registry giving versions to images.
+
+$ docker tag image username/repository:tag
+
+# e.g.:
+
+$ docker tag testimage jackstandbridge/testrepo:test
+
+# push to a repo:
+
+$ docker push jackstandbridge/testrepo:test
+
+# now if you go to hub.docker.com/r/username/testrepo the image will be visible.
+# from any machine, you can now run this app:
+$ docker run -p 4000:80 jackstandbridge/testrepo:test
+
+## Services
+
+# A service is like a container, but it is in production. Each service only runs one container, but it has predefined ways to run it. So when you run a container manually, you can specify the port, but a service will do that for you. It will also run multiple instances of the container if needed, and you can specify how many.
+
+# To create a service, you need a docker-commpose.yml file with contents similar to the following:
+
+version: "3"
+services:
+  web:
+    # replace username/repo:tag with your name and image details
+    image: username/repo:tag
+    deploy:
+      # how many instances of the container will run in the service
+      replicas: 5
+      resources:
+        limits:
+          # what proportion of the CPU each instance will take (in this case 10% each)
+          cpus: "0.1"
+          # how much RAM each instance will use
+          memory: 50M
+      restart_policy:
+        # immediately restart if one instance fails
+        condition: on-failure
+    ports:
+      # map port 4000 on the host to web's port 80
+      - "4000:80"
+    networks:
+      # instruct web's containers to share port 80 with a service called webnet
+      - webnet
+networks:
+  webnet:
+
+# before running the service, you need to run:
+$ docker swarm init
+
+# run 'docker stack deploy' to start using the service:
+$ docker stack deploy -c docker-compose.yml <appName>
+
+# to check the services:
+$ docker service ls
+# or
+$ docker stack service <appName>
+
+# a single instance of a container running in a service is called a task. Show all tasks:
+$ docker service ps <appName>
+
+# tasks also show up when you run 'docker container ls', but are not filtered by service.
+
+# to scale the app, change the number of replicas in the docker-compose.yml file and rerun the 'docker stack deploy':
+
+$ docker stack deploy -c docker-compose.yml <appName>
+
+# to take the app down:
+$ docker stack rm <appName>
+
+# to take the swarm down:
+$ docker swarm leave --force
+
+# Summary:
+
+$ docker stack ls                                            # List stacks or apps
+$ docker stack deploy -c <composefile> <appname>  # Run the specified Compose file
+$ docker service ls                 # List running services associated with an app
+$ docker service ps <service>                  # List tasks associated with an app
+$ docker inspect <task or container>                   # Inspect task or container
+$ docker container ls -q                                      # List container IDs
+$ docker stack rm <appname>                             # Tear down an application
+$ docker swarm leave --force      # Take down a single node swarm from the manager
+
+
+
+# When using docker-compose, if you add new dependencies to one of the directories, you need to run:
+
+$ docker-compose rm <project name as defined in docker-compose.yml>
+
+# e.g.:
+
+$ npm install axios
+$ cd ..
+$ docker-compose rm app
+$ docker-compose build
+$ docker-compose up
+
+
+# look into using volumes to get real time updates to containers.
+
+# to run mongodb on its own with docker:
+
+docker run -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4

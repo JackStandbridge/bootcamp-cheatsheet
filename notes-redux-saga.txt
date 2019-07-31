@@ -1,0 +1,146 @@
+// --- Redux Saga --- //
+
+// Redux middleware that deals with async actions
+
+// create a file called sagas.js
+// put export generator functions from it:
+
+export function* helloSaga() {
+	console.log('Hello Sagas!');
+}
+
+// a generator function is a function that can make a iterator object. A iterator object has a method of .next(), which can resume where it left off using the keyword yield that was defined in the generator function. When it yields something, it is like returning, but it will remember where it got up to, and on the next call, it will start again after that point. 
+
+// where you define the Redux store (probably index.js in project directory):
+
+import createSagaMiddleware from 'redux-saga';
+
+import { helloSaga } from './sagas';
+
+// initialize middleware:
+
+const sagaMiddleware = createSagaMiddleware();
+
+// apply middleware to store:
+
+const store = createStore(
+	reducer,
+	applyMiddleware(sagaMiddleware)
+)
+
+// run the saga:
+
+sagaMiddleware.run(helloSaga)
+
+// to set up async actions:
+
+import { put, takeEvery } from 'redux-saga/effects';
+
+export function* someAsyncActivity() {
+	yield somethingReturningPromise(args);
+	yield put({ type: 'ACTION_MODIFYING_STATE' });
+}
+
+export function* watchSomeAsyncAction() {
+	yield takeEvery('ASYNC_TRIGGERING_ACTION_NAME', someAsyncActivity);
+}
+
+// when a saga returns a promise, the middleware will pause that saga until the promise resolves, at which point it will resume the saga, executing the code until the next yield.
+
+// put: imported from redux-saga/effects, it is an effect. An effect is a JS object that tells the middlware what to do. Similar to promises, when the middleware receives an effect, it will the pause the saga until the effect is fulfilled.
+
+// takeEvery: imported from redux-saga/effects, it is a helper function. It listens for an action type, and when it finds one, calls a callback:
+
+yield takeEvery('ACTION', callback);
+
+// to use multiple sagas:
+
+import { all } from 'redux-saga/effects';
+
+export default function* rootSaga() {
+	yield all([
+		helloSaga(),
+		watchSomeAsyncAction(),
+	])
+}
+
+// import all from effects, then create a default export generator function called rootSaga. This should yield all (a function call), which is passed an array of the sagas to export. Importantly, this array is the result of calling those generator functions, i.e., it is an array of the Iterator Objects returned from the generator functions*.
+
+// amend index.js to import the rootSaga and sagaMiddleware.run to be passed the rootSaga:
+
+import rootSaga from './sagas';
+
+const sagaMiddleware = createSagaMiddleware()
+const store = createStore(
+	reducer,
+	applyMiddleware(sagaMiddleware),
+)
+
+sagaMiddleware.run(rootSaga);
+
+// Testing //
+
+// create a file called sagas.spec.js:
+
+import test from 'tape';
+
+import { someAsyncActivity } from './sagas';
+
+test('someAsyncActivity Saga test', assert => {
+	// assign the iterator object returned 
+	// from someAsyncActivity to a variable
+	const gen = someAsyncActivity();
+})
+
+// if we call .next() on gen, we will get objects with keys of 'done' and 'value'. The 'done' key will indicate whether the iterator object has gone over all the yield values from the generator function or not, expressed as booleans. The 'value' key will be the result of what was yielded. Once the two yield statements from the generator function are complete, calling .next() again will result in 'done' being true and 'value' being udefined.
+
+test('someAsyncActivity Saga test', assert => {
+	const gen = somethingReturningPromise();
+	assert.deepEqual(
+		gen.next(),
+		{ done: false, value: /* ??? */ },
+		'someAsyncActivity should return a Promise'
+	)
+})
+
+// because we can't just do a simple equality test on Promises, we need to yield the result of using the call function in 'redux-saga/effects' on the Promise, instead of just yielding the Promise
+
+// in sagas.js:
+
+import { call } from 'redux-saga/effects';
+
+export function* someAsyncActivity() {
+	yield call(somethingReturningPromise, args);
+	yield put({ type: 'ACTION_MODIFYING_STATE' });
+}
+
+// in this case, the function somethingReturningPromise is passed to the .next() function before it is called, and then the middleware will call it instead of calling it, then passing the result to the middlware. 'call' returns an Effect, just like 'put' does, so the saga is paused until the Effect is complete, at which point the saga resumes.
+
+import test from 'tape';
+
+import { put, call } from 'redux-saga/effects';
+import { someAsyncActivity } from './sagas';
+
+test('someAsyncActivity Saga test', assert => {
+	const gen = someAsyncActivity();
+
+	assert.deepEqual(
+		gen.next().value,
+		call(somethingReturningPromise, args),
+		'someAsyncActivity Saga must call somethingReturningPromise(args)'
+	);
+
+	assert.deepEqual(
+		gen.next().value,
+		put({type: 'ACTION_MODIFYING_STATE'}),
+		'someAsyncActivity Saga must dispatch an ACTION_MODIFYING_STATE action'
+	);
+
+	assert.deepEqual(
+		gen.next(),
+		{ done: true, value: undefined },
+		'someAsyncActivity Saga must be done'
+	);
+
+	assert.end();
+})

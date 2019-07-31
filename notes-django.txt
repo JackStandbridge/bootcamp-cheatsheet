@@ -1,0 +1,182 @@
+#--- Django Site ---#
+
+# check python is installed
+$ python -m django --version
+
+# create the project and run server
+$ django-admin startproject {site name}
+$ cd {site name}
+$ python manage.py runserver
+
+# create an app
+$ python manage.py startapp {app name}
+
+# this will create a directory for the app
+
+# open /{app name}/views.py and add the following:
+
+from django.http import HttpResponse
+
+def index(request):
+	return HttpResponse('example text to be displayed')
+
+# create /{app name}/urls.py and add the following:
+
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+	path('', views.index, name='index'),
+]
+
+# point the root url config in /{site name}/urls.py to the newly created /{app name}/urls.py
+# add 'include' to the django.urls import statement
+
+from django.urls import include, path
+
+# add the app directory's urls file to the url patterns list
+
+urlpatterns = [
+	path('polls/', include('polls.urls')),
+	# ...
+]
+
+# DB setup
+
+# open /{site name}/setting.py and change the database from SQLite to whatever DB you're using, or leave it as SQLite. Don't know how to make it work with MYSQL yet, might be more complicated/need a virtual env to make it work.
+
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.mysql',
+		'NAME': os.path.join(BASE_DIR, 'db.sql'),
+	}
+}
+
+# edit the TIME_ZONE variable if you want
+
+# run migration
+
+$ python manage.py migrate
+
+# create models in /{app name}/models.py
+# examples:
+
+class Question(models.Model):
+	question_text = models.CharField(max_length=200)
+	pub_date = models.DateTimeField('date published')
+
+class Choice(models.Model):
+	question = models.ForeignKey(Question, on_delete=models.CASCADE)
+	choice_text = models.CharField(max_length=200)
+	votes = models.IntergerField(default=0)
+
+# edit /{site name}/settings.py to include:
+
+INSTALLED_APPS = [
+	'{app name}.apps.{App Name}Config',
+	# ...
+]
+
+# make the migrations
+
+$ python manage.py makemigrations {app name}
+
+# view changes for a migration:
+
+$ python manage.py sqlmigrate {app name} {migration number, i.e. 0001}
+
+# perform migrations:
+
+$ python manage.py migrate
+
+# in summary, the 3 steps to making model changes are:
+
+# - change models in models.py
+# - $ python manage.py makemigrations
+# - $ python manage.py migrate
+# You can commit migrations to git so they can be used by others
+
+# use DJANGO_SETTING_MODULE env var while in the shell:
+
+$ python manage.py shell
+
+>>> from polls.models import Choice, Question
+
+>>> Question.objects.all()
+# <QuerySet []>
+
+>>> from django.utils import timezone
+>>> q = Question(question_text="What's new?", pub_date=timezone.now())
+
+>>> q.save()
+
+>>> q.id
+# 1
+
+>>> q.question_text
+# "What's new?"
+
+>>> q.pub_date
+# datetime.datetime(2019, 3, 1, 11, 7, 20, 435923, tzinfo=<UTC>)
+
+>>> q.question_text = "What's up?"
+>>> q.save()
+
+>>> Question.objects.all()
+# <QuerySet [<Question: Question object (1)>]>
+
+# add __str__ methods to models so that the output of Question.objects.all() becomes <QuerySet [<Question: What's up?>]>
+
+# lookup API:
+
+Question.objects.filter(id=1)
+Question.objects.filter(question_text__startswith='What')
+Question.objects.get(pk=1) # search by primary key
+
+
+# more examples: 
+
+>>> current_year = timezone.now().year
+>>> from datetime import datetime
+>>> q = Question.objects.get(pk=1)
+>>> q
+# <Question: What's up?>
+>>> q.was_published_recently()
+# True
+>>> q.choice_set.all()
+# <QuerySet []>
+>>> q.choice_set.create(choice_text='Not much', votes=0)
+# <Choice: Not much>
+>>> q.choice_set.create(choice_text='The sky', votes=0)
+# <Choice: The sky>
+>>> c = q.choice_set.create(choice_text='Just hacking again', votes=0)
+>>> c.question
+# <Question: What's up?>
+>>> q.choice_set.all()
+# <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
+>>> q.choice_set.count()
+# 3
+>>> from polls.models import Choice
+>>> Choice.objects.filter(question__pub_date__year=current_year)
+# <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
+>>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+>>> c.delete()
+(1, {'polls.Choice': 1})
+>>> Choice.objects.filter(question__pub_date__year=current_year)
+# <QuerySet [<Choice: Not much>, <Choice: The sky>]>
+
+
+# create a superuser:
+
+$ python manage.py createsuperuser
+
+# follow instructions
+
+# visit http://127.0.0.1:8000/admin/ and you can log in!
+
+# make models available in the admin back end, go to /{app name}/admin.py and add the following:
+
+from .models import Question
+
+admin.site.register(Question)

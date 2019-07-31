@@ -318,9 +318,9 @@ function create_custom_post_type_raspberry() {
     'singular_name' => 'Raspberry',
     'add_new' => 'Add New',
     'add_new_item' => 'Add New Raspberry',
-    'edit_item' => 'Add Raspberry',
+    'edit_item' => 'Edit Raspberry',
     'view_item' => 'View Raspberry',
-    'search_items' => 'Search Raspberry',
+    'search_items' => 'Search Raspberries',
     'not_found' => 'No Raspberries Found',
     'not_found_in_trash' => 'No Raspberries Found in Trash',
     'parent_item_colon' => ''
@@ -333,7 +333,7 @@ function create_custom_post_type_raspberry() {
     'can_export' => true,
     'show_ui' => true,
     '_builtin' => false,
-    'vapability_type' => 'post',
+    'capability_type' => 'post',
     'menu_icon' => 'dashicons-calendar', // customise favicon in dashboard
     'hierarchical' => false,
     'rewrite' => ['slug' => 'raspberries'], // defines url base: jackbox/raspberries

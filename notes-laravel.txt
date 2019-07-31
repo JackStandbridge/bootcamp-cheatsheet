@@ -533,7 +533,7 @@ return [
 // - make sure composer is installed
 // - $ composer install
 // - $ vendor/bin/homestead make
-// - $ mv env.example .env
+// - $ mv .env.example .env
 // - $ vagrant up
 // - $ vagrant ssh
 // - $ cd code

@@ -234,3 +234,11 @@ When using Gulp Npm and Git
 don't track: node_modules or package-lock.json // add these paths to your .gitignore file
 do track: package.json, gulpfile.js
 
+to get round the permissions issue caused by updating node
+$ sudo npm install --unsafe-perm=true --allow-root
+
+maybe another fix:
+$ sudo chown -R jack /Users/jack/.npm/_cacache/index-v5/ # do this for folders/paths that make permissions error messages when npm installing or npm starting
+
+deploy something to s3 on aws:
+npm run build && aws s3 sync dist/ s3://elephant-ie-testing

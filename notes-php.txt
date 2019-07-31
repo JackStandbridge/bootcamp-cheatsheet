@@ -333,3 +333,9 @@ $data = mysqli_fetch_assoc($result); // output is an array
 $data = $result->fetch_assoc(); // output is an array.
 
 TablePlus - software to show gui for sql tables.
+
+
+tail the log: 
+
+$ sudo su -
+$ tail /var/log/apache2/error.log 

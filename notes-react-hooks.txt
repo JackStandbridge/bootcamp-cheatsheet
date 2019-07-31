@@ -1,0 +1,39 @@
+// --- React Hooks --- //
+
+// useEffect
+
+// useEffect or React.useEffect if not imported replaces lifecycle methods like componentDidMount, componentDidUpdate, componentWillUnmount. It is run after every render:
+
+const thing = () => {
+	React.useEffect(() => {
+		console.log('this function runs every time the component renders');
+	});
+	return(
+		<div />
+	);
+}
+
+// to make the effect only run onMount, pass a second argument to useEffect. This must be an empty array:
+
+React.useEffect(() => {
+	console.log('this function runs like componentDidMount');
+}, []);
+
+// The effect compares what it received last time as the second argument and updates if it finds that what it received this time is different to the last time. E.g. if you have something in state called 'count' and it might or might not update between renders, you can do something like this:
+
+React.useEffect(() => {
+	console.log('this only runs when `count` has changed from the last render')
+}, [count]);
+
+// To get something to happen only if props changed, you can do something like this:
+
+React.useEffect(() => {
+	console.log('this only runs if the props have changed')
+}, [props.data]);
+
+// useState
+
+// useState accepts an initial and returns a variable that is tied to the value and a function used to update the value, which can be destructured in to an array:
+
+const [input, setInput] = useState('');
+

@@ -303,3 +303,7 @@ p {
 
 links:
 https://github.com/develop-me/fellowship-wk2-adv-html-css/tree/master/day08/02coolCSS
+
+@media all and (-ms-high-contrast:none) {
+  // all css in this block will be ignored by everything other than IE10 and IE11s
+}

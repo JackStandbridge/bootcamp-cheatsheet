@@ -1,0 +1,218 @@
+// --- DNS --- //
+
+computer requests the ip address from a dns using a web address. The dns responds with the ip address, then the computer goes and fetches the website.
+
+The registrar keeps records for where the records for a domain are. The registrar can respond with a name server.
+
+buy domain, set registrar to point to e.g. cloudflare (dns), then go to cloudflare to set up dns records.
+
+hosts file can be used to resolve a domain to an ip address of your choosing. It's like your own private dns server.
+
+Updates from dns takes quite a while to make its way through the internet. Might not see the changes to dns for quite a while after making them because of many layers of caching.
+
+A resolves to the domain or subdomain
+CNAME resolves to another domain
+MX is to do with email delivery
+TXT is text, can be used for meta data
+
+// Debugging the process:
+
+navigating to the url does nothing it might display this error:
+DNS_PROBE_FINISHED_NXDOMAIN
+
+go to https://network-tools.com
+or nominet.uk/whois
+or eurodns.com
+or whatsmydns.net
+
+use whois search to see if the domain exists.
+
+mxtoolbox.com
+
+do a dns lookup for the domain. It might be that there are no dns records.
+If everything above is set up correctly, there's probably a problem with the webserver or something
+
+More typically, start by pinging the web address.
+
+ping will let you know which ip address your computer is resolving the web address to. If the ip address it resolves to is wrong, then the dns records might be wrong, or maybe it's still propagating through the network.
+
+If everything is correct above, then there may be a problem on the server: Apache has crashed, files in the wrong place, etc.
+
+whatsmydns.net : shows what ip address something resolves to from different points around the world, can see the propagation of the dns info.
+
+in /etc/hosts you can map ip address to domains
+
+
+// --- Email --- //
+
+need to run a mail service on the web server first of all.
+
+sendmail and postfix are used to send mail out of a server
+
+If you're using, for example, php's mail function, it makes use of sendmail or postfix. These might not be properly configured, so you need to configure it yourself.
+
+test file:
+
+if (mail('me@gmail.com', /* headers */)) {
+	echo 'mail success'
+} else {
+	echo 'mail failure'
+}
+
+if it fails, sendmail or postfix might be broken. Email is not even getting outside the box. If it succeeds, the php mail function at least things that it has sent an email.
+
+When testing emails, make sure to check spam or junk email boxes.
+
+Email providers check the supposed 'from' domain. So if you're sending something from 'help@website.com', the email provider will check website.com and look at the mail headers and see from:'help@website.com', and originating:'1.1.1.1'(ip address), and compare website.com with the ip address.
+
+If you had many servers and wanted to send with the same 'from' address with them all, even though they have different ip addresses, you need dns settings that tell email providers that everything is fine: create a TXT dns entry with an 'spf' content.
+
+v=spf1 mx a include:spf.madrillapp.com include:servers.mcsv.net include:mcsignup.com ip4:1.1.1.1
+
+basically telling the mail providers that those servers/ip addresses have the right to send emails as you.
+
+Also, you can make a TXT with:
+
+v=DMARC1 ... etc. etc.
+
+now mail providers should report back to you whether emails have passed its spf checks, and you can see if your emails are getting through, or whether a lot of people are trying to spoof your email addresses.
+
+It is responsible to add a DMARC entry set up.
+
+Also:
+
+v=DKIM1 ... etc. etc.
+
+some kind of way to sign emails, not sure how it works
+
+mxtoolbox is a tool that has a load of utilities that are to help with email.
+
+e.g.: mxtoolbox.com/spf.aspx
+
+You can add the domain and the ip address and see if it would pass spf checks.
+
+You can also check to see if your ip address has been placed on any black lists.
+
+
+// Better email practices:
+
+instead of worrying about sendmail, postfix, spf records, blacklist, headers etc. use an API service to send emails for you:
+
+e.g. mailgun, mandrill (mailchimp)
+
+Then you can use the same api details across all servers because it all comes through the same service. Email delivery is left up to people who know what they are doing.
+
+It's a lot easier to call an API endpoint and get a 200 response in an app than to verify that everything in the email process has gone correctly.
+
+Spin up LuckyG dev server:
+
+go to: https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#Instances:sort=instanceId
+Select Development
+Actions -> Instance State -> Start
+
+To stop it:
+
+Actions -> Instance State -> Stop
+
+NEVER CLICK TERMINATE
+
+
+Serving different folders for different subdomains:
+Apache config:
+
+/etc/apache2/
+
+/sites-available /sites-enabled
+
+config files are in sites-available, and sites-enabled contains simlinks to them. Sites enabled is what indicates what is actually accessible.
+
+Restart apache every time you change config
+
+Can add config files for other behaviours, and apache will find them in sites-available.
+
+Need to specify ServerName if you have multiple subdomains:
+
+ServerName subdomain.domain.fr
+
+DocumentRoot needs to point to the directory to serve
+
+Look at existing config files to see the correct syntax
+
+Setting up separate config files for each subdomain is desirable, because otherwise the subdomains can't easily be split up, and redirects from HTTP to HTTPS might fail, and just redirect to the main domain instead.
+
+
+Issue certificates for each subdomain after creating non-ssl apache configs, e.g.:
+
+subdomain.domain.fr.conf
+
+It should look like this, where `subdomain.domain.fr` is replaced with the subdomain and domain of your site, and `path/to/folder/to/serve` is replaced by the directory that the subdomain's contents are stored in:
+
+```
+<VirtualHost *:80>
+	ServerName subdomain.domain.fr
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/path/to/folder/to/serve
+
+	<Directory /var/www/path/to/folder/to/serve/>
+		Options Indexes FollowSymLinks
+		AllowOverride All
+		Require all granted
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/error-subdomain.log
+	CustomLog ${APACHE_LOG_DIR}/access-subdomain.log combined
+
+	<IfModule mod_dir.c>
+		DirectoryIndex index.php index.pl index.cgi index.html index.xhtml$
+	</IfModule>
+
+	RewriteEngine on
+	RewriteCond %{SERVER_NAME} =subdomain.domain.fr
+	RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+```
+
+
+then issue with `certbot --apache -d subdomain.domain.fr`
+
+this will create an entry in `000-default-le-ssl.conf` in /etc/apache2/sites-available
+
+rename this file to `subdomain.domain.fr-ssl.conf`
+
+it should look like this, where `subdomain.domain.fr` is replaced with the subdomain and domain of your site, and `path/to/folder/to/serve` is replaced by the directory that the subdomain's contents are stored in:
+
+```
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+	ServerName subdomain.domain.fr
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/path/to/folder/to/serve
+
+	<Directory /var/www/path/to/folder/to/serve/>
+		Options Indexes FollowSymLinks
+		AllowOverride All
+		Require all granted
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/error-domain.fr.log
+	CustomLog ${APACHE_LOG_DIR}/access-domain.fr.log combined
+
+	<IfModule mod_dir.c>
+		DirectoryIndex index.php index.pl index.cgi index.html index.xhtml$
+	</IfModule>
+
+	Include /etc/letsencrypt/options-ssl-apache.conf
+	SSLCertificateFile /etc/letsencrypt/live/subdomain.domain.fr/fullchain.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/subdomain.domain.fr/privkey.pem
+</VirtualHost>
+</IfModule>
+```
+
+then cd into /etc/apache2/sites-enabled and make a symlink to both of the conf files:
+
+`ln -s ../sites-available/subdomain.domain.fr.conf`
+`ln -s ../sites-available/subdomain.domain.fr-ssl.conf`
+
+restart apache:
+
+`service apache2 restart`

@@ -43,3 +43,18 @@ GROUP BY field
 HAVING condition
 ORDER BY field
 LIMIT number
+
+// db dump:
+
+// ALWAYS HAVE A ROLLBACK PLAN, THERE IS NO WAY BACK, TAKE A DUMP OF ANY DB YOU'RE ABOUT TO OVERWRITE WITH ANOTHER DUMPED FILE
+
+// ssh into vagrant, navigate to code/public or /var/www/public
+$ mysqldump -u root -p [database name] > [filename]
+$ mysqldump homestead > db.sql
+
+$ mysql -u root -p [database name] < [filename]
+$ mysql homestead < db.sql
+
+// nice cheat sheet:
+
+// https://gist.github.com/hofmannsven/9164408
